@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AlbumPage } from "./AlbumPage";
-import ITunesPage from "./ITunesPage";
+import { AlbumPage } from "./ElementPage";
+import ITunesPage from "./ElementsPage";
 import { ROUTES } from "./Routes";
 import { HomePage } from "./HomePage";
 
@@ -9,8 +9,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.HOME} index element={<HomePage />} />
-        <Route path={ROUTES.ALBUMS} element={<ITunesPage />} />
-        <Route path={`${ROUTES.ALBUMS}/:id`} element={<AlbumPage />} />
+        <Route path={ROUTES.ELEMENTS} element={<ITunesPage />} />
+        <Route path={`${ROUTES.ELEMENTS}/:id`} element={<AlbumPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,25 @@
+.filter-form {
+	max-width: 600px;
+	margin: 0 auto;
+  }
+  
+  .filter-btn {
+	width: 100%;
+	padding: 10px;
+	background-color: #000000;
+	color: white;
+	border-radius: 16px;
+	font-size: 16px;
+	font-weight: 500;
+	outline: none;
+	transition: background-color 0.3s ease;
+  }
+  
+  .filter-btn:hover {
+	background-color: #89674A;
+  }
+  
+  .filter-btn:active {
+	background-color: #DCDEDC;
+  }
+  

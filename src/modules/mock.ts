@@ -1,6 +1,6 @@
-import { ITunesResult } from "./itunesApi";
+import { ITunesResult } from "./configurationApi";
 
-export const ALBUMS_MOCK: ITunesResult = {
+export const ELEMENTS_MOCK: ITunesResult = {
   resultCount: 3, 
   results: [
     {
