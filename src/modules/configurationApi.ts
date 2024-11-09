@@ -41,7 +41,8 @@ export interface ConfigurationElement {
 	maxPrice: number = 100000000
   ): Promise<ConfigurationElementsResult> => {
 	try {
-	  const url = `/api/plane_configuration_elements/?category=${category}&min_price=${minPrice}&max_price=${maxPrice}`;
+	  // Изменяем параметры на `price_min` и `price_max`
+	  const url = `/api/plane_configuration_elements/?category=${category}&price_min=${minPrice}&price_max=${maxPrice}`;
 	  const response = await fetch(url);
 	  if (!response.ok) {
 		throw new Error('Не удалось получить элементы по фильтрам');
@@ -52,4 +53,5 @@ export interface ConfigurationElement {
 	  throw error;
 	}
   };
+  
   

@@ -17,8 +17,9 @@
     margin-bottom:12px;
 }
 .cardImage {
-    object-fit: contain;
+    object-fit: cover;
 }
 .cardButton {
     width: 100%;
 }
+

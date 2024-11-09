@@ -13,3 +13,7 @@
         min-width: auto;
     }
 }
+
+#root {
+    width: 100%;
+}

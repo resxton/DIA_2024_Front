@@ -1,9 +1,10 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Navbar, Nav, Container, Image, Badge, Row, Col, Form, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Image, Badge, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { getConfigurationElements, ConfigurationElementsResult } from './modules/configurationApi';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
+import { FilterComponent } from './components/FilterComponent';
 
 interface ConfigurationElement {
   pk: number;
@@ -17,101 +18,66 @@ interface ConfigurationElement {
 }
 
 const ElementsPage: FC = () => {
-  const [draftElementsCount, setDraftElementsCount] = useState(0);
+  const [draft_elements_count, setDraftElementsCount] = useState(0);
   const [elements, setElements] = useState<ConfigurationElement[]>([]);
   const [category, setCategory] = useState('');
-  const [minPrice, setMinPrice] = useState(0);
+  const [minPrice, setMinPrice] = useState(1);
   const [maxPrice, setMaxPrice] = useState(100000000);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getConfigurationElements()
+    getConfigurationElements(category, minPrice, maxPrice)
       .then((response: ConfigurationElementsResult) => {
         setElements(response.configuration_elements);
         setDraftElementsCount(response.draft_elements_count);
       })
       .catch((error) => console.error("Ошибка при загрузке данных:", error));
-  }, []);
+  }, [category, minPrice, maxPrice]); // Добавляем зависимость от фильтров
 
-  const handleFilterSubmit = () => {
-    getConfigurationElements(category, minPrice, maxPrice)
-      .then((response: ConfigurationElementsResult) => {
-        setElements(response.configuration_elements);
-      })
-      .catch((error) => console.error("Ошибка при фильтрации:", error));
+  const handleFilterChange = (category: string, minPrice: number, maxPrice: number) => {
+    setCategory(category);
+    setMinPrice(minPrice);
+    setMaxPrice(maxPrice);
   };
 
-  const handleCartClick = () => navigate('/cart');
   const handleLogoClick = () => navigate('/');
 
   return (
     <div className="elements-page">
-      <Navbar bg="light" expand="lg">
-        <Container>
-          <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
-            <img
-              src="http://127.0.0.1:9000/service/logo.svg"
-              alt="Nimbus Logo"
-              width={30}
-              height={30}
-              className="d-inline-block align-top"
-            />
-            Nimbus
-          </Navbar.Brand>
+      <Navbar className="bg-body-tertiary" expand="lg" >
+        {/* Логотип и Название */}
+        <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className='m-3'>
+          <img
+            src="http://127.0.0.1:9000/service/logo.svg"
+            alt="Nimbus Logo"
+            width={30}
+            height={30}
+            className="d-inline-block align-top"
+          />{' '}
+          Nimbus
+        </Navbar.Brand>
+
+        {/* Элементы навигации */}
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
           <Nav className="ml-auto">
-            <Nav.Link href="/plane-configuration-elements">Элементы</Nav.Link>
-            <Nav.Link onClick={handleCartClick}>
-              <Image
-                src="http://127.0.0.1:9000/service/plane.svg"
-                alt="Корзина"
-                width={30}
-                height={30}
-                style={{ cursor: 'pointer' }}
-              />
-              <Badge bg="secondary" style={{ position: 'absolute', top: 0, right: 0 }}>
-                {draftElementsCount}
-              </Badge>
-            </Nav.Link>
+            <Nav.Link href="/configuration-elements">Элементы конфигурации</Nav.Link>
           </Nav>
-        </Container>
+        </Navbar.Collapse>
       </Navbar>
 
-      <Container className="mt-4">
-        <h2>Элементы конфигурации</h2>
-        <Form className="filter-form">
-          <Row>
-            <Col>
-              <Form.Group controlId="categorySelect">
-                <Form.Label>Категория:</Form.Label>
-                <Form.Control as="select" value={category} onChange={(e) => setCategory(e.target.value)}>
-                  <option value="">Выберите категорию</option>
-                  <option value="Дизайн салона">Дизайн салона</option>
-                  <option value="Компоновка салона">Компоновка салона</option>
-                  <option value="Двигатель">Двигатель</option>
-                  <option value="Авионика">Авионика</option>
-                  <option value="Кресло">Кресло</option>
-                </Form.Control>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="minPrice">
-                <Form.Label>Цена от</Form.Label>
-                <Form.Control type="number" value={minPrice} onChange={(e) => setMinPrice(Number(e.target.value))} />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="maxPrice">
-                <Form.Label>до</Form.Label>
-                <Form.Control type="number" value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
-              </Form.Group>
-            </Col>
-            <Col className="d-flex align-items-end">
-              <Button onClick={handleFilterSubmit}>Фильтровать</Button>
-            </Col>
-          </Row>
-        </Form>
-
-        <Row>
+      <Container fluid className="mt-4 w-75" >
+        <h2 className='mb-4'>Элементы конфигурации</h2>
+        
+        {/* Вставляем компонент фильтрации */}
+        <FilterComponent 
+          selectedCategory={category} 
+          selectedPriceMin={minPrice} 
+          selectedPriceMax={maxPrice} 
+          onFilterChange={handleFilterChange} 
+        />
+        
+        <Row className="w-100">
           {elements.map((element) => (
             <Col key={element.pk} xs={12} sm={6} md={4} className="mb-4">
               <ElementCard

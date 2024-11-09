@@ -14,7 +14,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   selectedPriceMax, 
   onFilterChange 
 }) => {
-  const [category, setCategory] = useState(selectedCategory);
+  const [category, setCategory] = useState(selectedCategory || '');
   const [minPrice, setMinPrice] = useState(selectedPriceMin);
   const [maxPrice, setMaxPrice] = useState(selectedPriceMax);
 
@@ -36,57 +36,71 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit} className="filter-form">
-      <Row>
-        {/* Первая строка — категория с Dropdown */}
-        <Col xs={12}>
-          <Form.Group controlId="categories">
-            <Form.Label>Категория</Form.Label>
-            <Dropdown>
-              <Dropdown.Toggle variant="success" id="dropdown-category">
-                {category || 'Выберите категорию'}
-              </Dropdown.Toggle>
+    <Form onSubmit={handleSubmit} className="filter-form mb-4">
+      {/* Первая строка — категория с Dropdown */}
+      <Form.Group as={Row} className="mb-3" controlId="categories">
+        <Form.Label column sm={1}>
+          Категория
+        </Form.Label>
+        <Col sm={6}>
+          <Dropdown>
+            <Dropdown.Toggle id="dropdown-category">
+              {category || 'Выберите категорию'}
+            </Dropdown.Toggle>
 
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => handleCategorySelect('Компоновка салона')}>Компоновка салона</Dropdown.Item>
-                <Dropdown.Item onClick={() => handleCategorySelect('Дизайн салона')}>Дизайн салона</Dropdown.Item>
-                <Dropdown.Item onClick={() => handleCategorySelect('Авионика')}>Авионика</Dropdown.Item>
-                <Dropdown.Item onClick={() => handleCategorySelect('Двигатель')}>Двигатель</Dropdown.Item>
-                <Dropdown.Item onClick={() => handleCategorySelect('Кресло')}>Кресло</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Form.Group>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => handleCategorySelect('')}>
+                Выберите категорию
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleCategorySelect('Компоновка салона')}>
+                Компоновка салона
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleCategorySelect('Дизайн салона')}>
+                Дизайн салона
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleCategorySelect('Авионика')}>
+                Авионика
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleCategorySelect('Двигатель')}>
+                Двигатель
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => handleCategorySelect('Кресло')}>
+                Кресло
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Col>
-      </Row>
+      </Form.Group>
 
-      <Row>
-        {/* Вторая строка — цены */}
-        <Col xs={12} md={6}>
-          <Form.Group controlId="priceMin">
-            <Form.Label>Цена от</Form.Label>
-            <Form.Control
-              type="number"
-              name="price_min"
-              value={minPrice}
-              onChange={handleMinPriceChange}
-              placeholder="0"
-            />
-          </Form.Group>
+      {/* Вторая строка — цена от и до */}
+      <Form.Group as={Row} className="mb-3">
+        <Form.Label column sm={1}>
+          Цена от
+        </Form.Label>
+        <Col sm={3}>
+          <Form.Control
+            type="number"
+            name="price_min"
+            value={minPrice}
+            onChange={handleMinPriceChange}
+            placeholder="0"
+          />
         </Col>
-
-        <Col xs={12} md={6}>
-          <Form.Group controlId="priceMax">
-            <Form.Label>до</Form.Label>
-            <Form.Control
-              type="number"
-              name="price_max"
-              value={maxPrice}
-              onChange={handleMaxPriceChange}
-              placeholder="∞"
-            />
-          </Form.Group>
+      </Form.Group>
+      <Form.Group as={Row} className="mb-3">
+        <Form.Label column sm={1}>
+          до
+        </Form.Label>
+        <Col sm={3}>
+          <Form.Control
+            type="number"
+            name="price_max"
+            value={maxPrice}
+            onChange={handleMaxPriceChange}
+            placeholder="∞"
+          />
         </Col>
-      </Row>
+      </Form.Group>
 
       <Button type="submit" className="filter-btn">
         Фильтровать
