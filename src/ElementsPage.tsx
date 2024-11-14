@@ -5,6 +5,7 @@ import { getConfigurationElements, ConfigurationElementsResult } from './modules
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
 import { FilterComponent } from './components/FilterComponent';
+import { ELEMENTS_MOCK } from './modules/mock';
 
 interface ConfigurationElement {
   pk: number;
@@ -18,7 +19,7 @@ interface ConfigurationElement {
 }
 
 const ElementsPage: FC = () => {
-  const [draft_elements_count, setDraftElementsCount] = useState(0);
+  const [draftElementsCount, setDraftElementsCount] = useState(0);
   const [elements, setElements] = useState<ConfigurationElement[]>([]);
   const [category, setCategory] = useState('');
   const [minPrice, setMinPrice] = useState(1);
@@ -26,13 +27,19 @@ const ElementsPage: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Попытка получить данные с API
     getConfigurationElements(category, minPrice, maxPrice)
       .then((response: ConfigurationElementsResult) => {
         setElements(response.configuration_elements);
         setDraftElementsCount(response.draft_elements_count);
       })
-      .catch((error) => console.error("Ошибка при загрузке данных:", error));
-  }, [category, minPrice, maxPrice]); // Добавляем зависимость от фильтров
+      .catch((error) => {
+        console.error("Ошибка при загрузке данных:", error);
+        // В случае ошибки использовать моковые данные
+        setElements(ELEMENTS_MOCK.configuration_elements);
+        setDraftElementsCount(ELEMENTS_MOCK.draft_elements_count);
+      });
+  }, [category, minPrice, maxPrice]);
 
   const handleFilterChange = (category: string, minPrice: number, maxPrice: number) => {
     setCategory(category);
@@ -45,7 +52,6 @@ const ElementsPage: FC = () => {
   return (
     <div className="elements-page">
       <Navbar className="bg-body-tertiary" expand="lg" >
-        {/* Логотип и Название */}
         <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className='m-3'>
           <img
             src="http://127.0.0.1:9000/service/logo.svg"
@@ -56,8 +62,6 @@ const ElementsPage: FC = () => {
           />{' '}
           Nimbus
         </Navbar.Brand>
-
-        {/* Элементы навигации */}
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ml-auto">
@@ -66,31 +70,44 @@ const ElementsPage: FC = () => {
         </Navbar.Collapse>
       </Navbar>
 
-      <Container fluid className="mt-4 w-75" >
+      <Container fluid className="mt-4 w-75">
         <h2 className='mb-4'>Элементы конфигурации</h2>
         
-        {/* Вставляем компонент фильтрации */}
-        <FilterComponent 
-          selectedCategory={category} 
-          selectedPriceMin={minPrice} 
-          selectedPriceMax={maxPrice} 
-          onFilterChange={handleFilterChange} 
-        />
+        {/* Фильтр и корзина */}
+        <div className="filter-cart-container">
+          <FilterComponent 
+            selectedCategory={category} 
+            selectedPriceMin={minPrice} 
+            selectedPriceMax={maxPrice} 
+            onFilterChange={handleFilterChange} 
+          />
+          <div className="cart-icon" onClick={() => navigate('')}>
+            <img src="http://127.0.0.1:9000/service/plane.svg" alt="Cart Icon" width={30} height={30} />
+            <Badge pill bg="primary" className="draft-count-badge">
+              {draftElementsCount}
+            </Badge>
+          </div>
+        </div>
         
-        <Row className="w-100">
-          {elements.map((element) => (
-            <Col key={element.pk} xs={12} sm={6} md={4} className="mb-4">
-              <ElementCard
-                id={element.pk}
-                name={element.name}
-                price={element.price}
-                category={element.category}
-                image={element.image || './assets/DefaultImage.png'}
-                detail_text={element.detail_text}
-              />
-            </Col>
-          ))}
-        </Row>
+        {/* Проверяем, есть ли элементы для отображения */}
+        {elements.length > 0 ? (
+          <Row className="w-100">
+            {elements.map((element) => (
+              <Col key={element.pk} xs={12} sm={6} md={4} className="mb-4">
+                <ElementCard
+                  id={element.pk}
+                  name={element.name}
+                  price={element.price}
+                  category={element.category}
+                  image={element.image}
+                  detail_text={element.detail_text}
+                />
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          <div className="no-results">Ничего не найдено</div>
+        )}
       </Container>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Card, Button } from 'react-bootstrap';
-import defaultImage from "../assets/DefaultImage.png";
+import { useNavigate } from 'react-router-dom';
+import defaultImage from "../assets/Default.jpeg";
 import './ElementCard.css';
 
 interface Props {
@@ -8,17 +9,21 @@ interface Props {
   name: string;
   price: number;
   category: string;
-  image: string;
+  image?: string;
   detail_text: string;
 }
 
 export const ElementCard: FC<Props> = ({ id, name, price, category, image, detail_text }) => {
+  const navigate = useNavigate();
+
   const handleMoreInfoClick = () => {
-    window.location.href = `/configuration-element/${id}`;
+    console.log(`/configuration-elements/${id}`);
+    window.location.href = `/configuration-elements/${id}`;
   };
+  
 
   return (
-    <Card className="element-card h-100"> {/* Используем h-100 для полной высоты карточки */}
+    <Card className="element-card h-100">
       <Card.Img
         variant="top"
         src={image || defaultImage}

@@ -1,30 +1,38 @@
-import "./ElementPage";
+import "./ElementPage.css"; // создайте и подключите файл для кастомных стилей
 import { FC, useEffect, useState } from "react";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "./Routes";
 import { useParams } from "react-router-dom";
 import { ConfigurationElement, getConfigurationElementById } from "./modules/configurationApi";
-import { Col, Row, Spinner, Image } from "react-bootstrap";
-// import { ALBUMS_MOCK } from "./modules/mock";
-import defaultImage from "./assets/DefaultImage.png";
+import { Spinner, Image } from "react-bootstrap";
+import defaultImage from "./assets/Default.jpeg";
+import { ELEMENTS_MOCK } from "./modules/mock";
 
-export const AlbumPage: FC = () => {
-  const [pageData, setPageDdata] = useState<ConfigurationElement>();
+export const ElementPage: FC = () => {
+  const [pageData, setPageData] = useState<ConfigurationElement>();
 
-  const { id } = useParams(); // ид страницы, пример: "/albums/12"
+  const { id } = useParams(); // Получаем ID страницы
 
   useEffect(() => {
     if (!id) return;
-    getConfigurationElementById(0)
-      .then((response) => setPageDdata(response))
-      // .catch(
-      //   () =>
-      //     setPageDdata(
-      //       ALBUMS_MOCK.results.find(
-      //         (album) => String(album.collectionId) == id
-      //       )
-      //     ) /* В случае ошибки используем мок данные, фильтруем по ид */
-      // );
+
+    // Попробуем получить данные с API
+    getConfigurationElementById(Number(id))
+      .then((response) => setPageData(response))
+      .catch(() => {
+        // В случае ошибки или если нет интернета, используем мок
+        console.error("Ошибка при загрузке данных, используется мок.");
+        
+        // Ищем элемент с данным ID в моке
+        const mockElement = ELEMENTS_MOCK.configuration_elements.find(
+          (element) => element.pk === Number(id)
+        );
+        
+        // Если элемент найден в моках, устанавливаем его как данные страницы
+        if (mockElement) {
+          setPageData(mockElement);
+        }
+      });
   }, [id]);
 
   return (
@@ -35,31 +43,31 @@ export const AlbumPage: FC = () => {
           { label: pageData?.name || "Элемент конфигурации" },
         ]}
       />
-      {pageData ? ( // проверка на наличие данных, иначе загрузка
-        <div className="container">
-          <Row>
-            <Col md={6}>
-              <p>
-                Альбом: <strong>{pageData.name}</strong>
-              </p>
-              <p>
-                Исполнитель: <strong>{pageData.category}</strong>
-              </p>
-            </Col>
-            <Col md={6}>
+      {pageData ? (
+        <div className="content">
+          <div className="detail-card">
+            <h1 className="detail-card-title">{pageData.name}</h1>
+            <div className="detail-card-img-container">
               <Image
-                src={pageData.image || defaultImage} // дефолтное изображение, если нет artworkUrl100
-                alt="Картинка"
-                width={100}
+                src={pageData.image || defaultImage}
+                alt={pageData.name}
+                className="detail-card-img"
+                fluid
               />
-            </Col>
-          </Row>
+            </div>
+            <p className="detail-card-text">{pageData.detail_text || "Описание недоступно."}</p>
+            <h2 className="detail-card-price">
+              Стоимость: ${pageData.price || "N/A"}
+            </h2>
+          </div>
         </div>
       ) : (
-        <div className="album_page_loader_block">{/* загрузка */}
+        <div className="album_page_loader_block">
           <Spinner animation="border" />
         </div>
       )}
     </div>
   );
 };
+
+export default ElementPage

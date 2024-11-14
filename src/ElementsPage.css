@@ -17,3 +17,36 @@
 #root {
     width: 100%;
 }
+
+.filter-cart-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.no-results {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #888;
+    margin-top: 20px;
+}
+
+.filter-form {
+    flex-grow: 1;
+    margin-left: 40px;
+}
+
+.cart-icon {
+    position: relative;
+    cursor: pointer;
+    margin-left: 20px;
+    margin-right: 40px;
+}
+
+.draft-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+}
+

@@ -27,6 +27,7 @@ export interface ConfigurationElement {
 	  if (!response.ok) {
 		throw new Error(`Не удалось получить элемент с id ${id}`);
 	  }
+	  console.log(response)
 	  return response.json();
 	} catch (error) {
 	  console.error(error);
