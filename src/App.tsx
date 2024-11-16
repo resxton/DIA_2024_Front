@@ -6,7 +6,7 @@ import { HomePage } from "./HomePage";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/DIA_2024_Front">
       <Routes>
         <Route path={ROUTES.HOME} index element={<HomePage />} />
         <Route path={ROUTES.ELEMENTS} element={<ElementsPage />} />

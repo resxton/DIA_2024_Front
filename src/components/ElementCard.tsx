@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Card, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import defaultImage from "../assets/Default.jpeg";
 import './ElementCard.css';
 
@@ -13,8 +13,8 @@ interface Props {
   detail_text: string;
 }
 
-export const ElementCard: FC<Props> = ({ id, name, price, category, image, detail_text }) => {
-  const navigate = useNavigate();
+export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => {
+  // const navigate = useNavigate();
 
   const handleMoreInfoClick = () => {
     console.log(`/configuration-elements/${id}`);

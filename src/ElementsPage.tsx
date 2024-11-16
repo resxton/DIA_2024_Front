@@ -1,11 +1,13 @@
-import React, { FC, useState, useEffect } from 'react';
-import { Navbar, Nav, Container, Image, Badge, Row, Col } from 'react-bootstrap';
+import { FC, useState, useEffect } from 'react';
+import { Navbar, Nav, Container, Badge, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { getConfigurationElements, ConfigurationElementsResult } from './modules/configurationApi';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
 import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
+import planeIcon from './assets/plane.svg'
+import logo from './assets/logo.svg'
 
 interface ConfigurationElement {
   pk: number;
@@ -54,7 +56,7 @@ const ElementsPage: FC = () => {
       <Navbar className="bg-body-tertiary" expand="lg" >
         <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className='m-3'>
           <img
-            src="http://127.0.0.1:9000/service/logo.svg"
+            src={logo}
             alt="Nimbus Logo"
             width={30}
             height={30}
@@ -82,7 +84,7 @@ const ElementsPage: FC = () => {
             onFilterChange={handleFilterChange} 
           />
           <div className="cart-icon" onClick={() => navigate('')}>
-            <img src="http://127.0.0.1:9000/service/plane.svg" alt="Cart Icon" width={30} height={30} />
+            <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
             <Badge pill bg="primary" className="draft-count-badge">
               {draftElementsCount}
             </Badge>
