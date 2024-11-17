@@ -13,6 +13,6 @@ export default defineConfig({
     },
     port: 3000
   },
-  base: "/DIA_2024_Front", 
+  base: "DIA_2024_Front", 
   plugins: [react()],
 })
