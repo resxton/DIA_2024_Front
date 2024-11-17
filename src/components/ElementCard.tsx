@@ -17,8 +17,7 @@ export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => 
   // const navigate = useNavigate();
 
   const handleMoreInfoClick = () => {
-    console.log(`/configuration-elements/${id}`);
-    window.location.href = `/configuration-elements/${id}`;
+    window.location.href = `configuration-elements/${id}`;
   };
   
 
