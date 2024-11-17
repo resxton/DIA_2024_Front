@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button, Row, Col, Dropdown } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { setCategory, setMinPrice, setMaxPrice } from "../redux/filterSlice";
 
 interface FilterComponentProps {
   selectedCategory: string;
@@ -14,20 +17,24 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   selectedPriceMax, 
   onFilterChange 
 }) => {
-  const [category, setCategory] = useState(selectedCategory || '');
-  const [minPrice, setMinPrice] = useState(selectedPriceMin);
-  const [maxPrice, setMaxPrice] = useState(selectedPriceMax);
+  // const [category, setCategory] = useState(selectedCategory || '');
+  // const [minPrice, setMinPrice] = useState(selectedPriceMin);
+  // const [maxPrice, setMaxPrice] = useState(selectedPriceMax);
+
+  const dispatch = useDispatch();
+  const { category, minPrice, maxPrice } = useSelector((state: RootState) => state.filter);
+
 
   const handleCategorySelect = (category: string) => {
-    setCategory(category);
+    dispatch(setCategory(category));
   };
-
+  
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMinPrice(Number(e.target.value));
+    dispatch(setMinPrice(Number(e.target.value)));
   };
-
+  
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxPrice(Number(e.target.value));
+    dispatch(setMaxPrice(Number(e.target.value)));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,14 +42,17 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     onFilterChange(category, minPrice, maxPrice);
   };
 
+  console.log("Current Filters: ", { category, minPrice, maxPrice }); // Добавьте это для отладки
+
+
   return (
     <Form onSubmit={handleSubmit} className="filter-form mb-4">
       {/* Первая строка — категория с Dropdown */}
-      <Form.Group as={Row} className="mb-3" controlId="categories">
-        <Form.Label column sm={1}>
+      <Form.Group as={Row} className="mb-3">
+        <Form.Label column sm={2} htmlFor="dropdown-category">
           Категория
         </Form.Label>
-        <Col sm={6}>
+        <Col sm={5}>
           <Dropdown>
             <Dropdown.Toggle id="dropdown-category">
               {category || 'Выберите категорию'}
@@ -74,12 +84,13 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
 
       {/* Вторая строка — цена от и до */}
       <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm={1}>
+        <Form.Label column sm={2} htmlFor="price_min">
           Цена от
         </Form.Label>
-        <Col sm={3}>
+        <Col sm={4}>
           <Form.Control
             type="number"
+            id="price_min"
             name="price_min"
             value={minPrice}
             onChange={handleMinPriceChange}
@@ -88,16 +99,17 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm={1}>
+        <Form.Label column sm={2} htmlFor="price_max">
           до
         </Form.Label>
-        <Col sm={3}>
+        <Col sm={4}>
           <Form.Control
             type="number"
+            id="price_max"
             name="price_max"
             value={maxPrice}
             onChange={handleMaxPriceChange}
-            placeholder="∞"
+            placeholder="100000000"
           />
         </Col>
       </Form.Group>

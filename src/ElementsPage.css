@@ -4,9 +4,13 @@
     padding: 20px 40px;
     min-width: 800px;
 }
+
+
 .containerLoading {
     filter: blur(8px);
 }
+
+
 
 @media (max-width: 600px) {
     .container{
@@ -49,4 +53,5 @@
     top: -5px;
     right: -10px;
 }
+
 

@@ -74,7 +74,7 @@ const ElementsPage: FC = () => {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ml-auto">
-            <Nav.Link href="/configuration-elements">Элементы конфигурации</Nav.Link>
+            <Nav.Link href="configuration-elements">Элементы конфигурации</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -102,7 +102,7 @@ const ElementsPage: FC = () => {
         {elements.length > 0 ? (
           <Row className="w-100">
             {elements.map((element) => (
-              <Col key={element.pk} xs={12} sm={6} md={4} className="mb-4">
+              <Col key={element.pk} xs={12} md={6} lg={4} className="mb-4">
                 <ElementCard
                   id={element.pk}
                   name={element.name}
