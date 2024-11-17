@@ -1,8 +1,8 @@
 import { ConfigurationElementsResult } from "./configurationApi";
 
 export const ELEMENTS_MOCK: ConfigurationElementsResult = {
-  draft_configuration_id: 123,
-  draft_elements_count: 5,
+  draft_configuration_id: 1,
+  draft_elements_count: 0,
   configuration_elements: [
     {
       pk: 1,
