@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Button, Row, Col, Dropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -12,9 +12,6 @@ interface FilterComponentProps {
 }
 
 export const FilterComponent: React.FC<FilterComponentProps> = ({ 
-  selectedCategory, 
-  selectedPriceMin, 
-  selectedPriceMax, 
   onFilterChange 
 }) => {
   // const [category, setCategory] = useState(selectedCategory || '');
