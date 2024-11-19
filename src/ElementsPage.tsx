@@ -8,6 +8,8 @@ import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
 import planeIcon from './assets/plane.svg'
 import logo from './assets/logo.svg'
+import { BreadCrumbs } from './components/BreadCrumbs';
+import { ROUTES, ROUTE_LABELS } from './Routes';
 
 interface ConfigurationElement {
   pk: number;
@@ -78,6 +80,12 @@ const ElementsPage: FC = () => {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
+
+      <BreadCrumbs
+        crumbs={[
+          { label: ROUTE_LABELS.ELEMENTS, path: ROUTES.ELEMENTS }
+        ]}
+      />
 
       <Container fluid className="mt-4 w-75">
         <h2 className='mb-4'>Элементы конфигурации</h2>
