@@ -36,7 +36,14 @@ const ElementsPage: FC = () => {
       .catch((error) => {
         console.error("Ошибка при загрузке данных:", error);
         // В случае ошибки использовать моковые данные
-        setElements(ELEMENTS_MOCK.configuration_elements);
+        // Фильтрация моковых данных
+        const filteredMockElements = ELEMENTS_MOCK.configuration_elements.filter(
+          (element) =>
+            element.category.includes(category) &&
+            element.price >= minPrice &&
+            element.price <= maxPrice
+        );
+        setElements(filteredMockElements);
         setDraftElementsCount(ELEMENTS_MOCK.draft_elements_count);
       });
   }, [category, minPrice, maxPrice]);
