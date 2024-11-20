@@ -44,7 +44,7 @@ const ElementsPage: FC = () => {
             element.price <= maxPrice
         );
         setElements(filteredMockElements);
-        setDraftElementsCount(ELEMENTS_MOCK.draft_elements_count);
+        setDraftElementsCount(0);
       });
   }, [category, minPrice, maxPrice]);
 
