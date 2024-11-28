@@ -3,27 +3,8 @@ import { ElementPage } from "./ElementPage";
 import ElementsPage from "./ElementsPage";
 import { ROUTES } from "./Routes";
 import { HomePage } from "./HomePage";
-import { useEffect } from "react";
 
 function App() {
-
-  useEffect(() => {
-    if (window.TAURI) {
-      const { invoke } = window.TAURI.tauri;
-
-      invoke('tauri', { cmd: 'create' })
-        .then((response: any) => console.log(response))
-        .catch((error: any) => console.log(error));
-
-      return () => {
-        invoke('tauri', { cmd: 'close' })
-          .then((response: any) => console.log(response))
-          .catch((error: any) => console.log(error));
-      };
-    }
-  }, []);
-  
-
   return (
     <BrowserRouter basename="/DIA_2024_Front">
       <Routes>
@@ -33,6 +14,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
-}queueMicrotask
+}
 
 export default App;
