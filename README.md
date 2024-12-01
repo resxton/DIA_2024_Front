@@ -1,50 +1,69 @@
-# React + TypeScript + Vite
+## PlaneConfigurationSystem
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the **PlaneConfigurationSystem** project! This application provides a streamlined solution for designing and configuring custom airplanes. Built with React, TypeScript, and Vite, it ensures a fast and modern development experience.  
 
-Currently, two official plugins are available:
+### Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Interactive UI for selecting and customizing airplane components.
+- Carousel showcasing available airplane parts and configurations.
+- Navigation system to explore configurations and element details.
+- Responsive design using React-Bootstrap.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Technologies Used
 
-- Configure the top-level `parserOptions` property like this:
+- **React**: Component-based UI development.
+- **TypeScript**: Type-safe coding experience.
+- **Vite**: Fast development server and build tool.
+- **React-Bootstrap**: Responsive styling and layout components.
+- **React Router**: Client-side navigation.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+---
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Installation
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Follow these steps to set up the project locally:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repo/PlaneConfigurationSystem.git
+   cd PlaneConfigurationSystem
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:3000`.
+
+---
+
+### Available Scripts
+
+- **`npm run dev`**: Starts the development server with hot module reloading.
+- **`npm run build`**: Builds the project for production.
+- **`npm run preview`**: Previews the production build.
+- **`npm run lint`**: Runs ESLint to analyze code quality.
+
+---
+
+### Contributions
+
+Contributions are welcome! Feel free to fork the repository and submit a pull request.  
+
+---
+
+### License
+
+This project is licensed under the [MIT License](LICENSE).  
+
+---
+
+Enjoy building your dream airplane with **PlaneConfigurationSystem**! ✈️

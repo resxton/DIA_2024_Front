@@ -55,3 +55,42 @@
 }
 
 
+/* Стили для спиннера и блюра */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);  /* Белый фон с прозрачностью */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;  /* Высокий z-index, чтобы перекрыть все остальные элементы */
+  }
+  
+  .loading-overlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .elements-page {
+    position: relative;
+  }
+  
+  .filter-cart-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .cart-icon {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .draft-count-badge {
+    margin-left: 8px;
+  }
+  

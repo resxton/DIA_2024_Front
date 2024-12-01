@@ -12,6 +12,7 @@ import { ConfigurationElement } from "./api/Api";
 
 export const ElementPage: FC = () => {
   const [pageData, setPageData] = useState<ConfigurationElement>();
+  const [loading, setLoading] = useState(true); // Добавим состояние загрузки
 
   const { id } = useParams(); // Получаем ID страницы
 
@@ -20,7 +21,7 @@ export const ElementPage: FC = () => {
 
     // Попробуем получить данные с API
     api.planeConfigurationElement
-    .planeConfigurationElementRead(id) // С использованием сгенерированного метода
+      .planeConfigurationElementRead(id) // С использованием сгенерированного метода
       .then((response) => {
         // Извлекаем данные из response.data
         const elementData = response.data as ConfigurationElement;
@@ -39,11 +40,19 @@ export const ElementPage: FC = () => {
         if (mockElement) {
           setPageData(mockElement);
         }
+      })
+      .finally(() => {
+        setLoading(false); // После загрузки данных выключаем индикатор загрузки
       });
   }, [id]);
 
   return (
-    <div>
+    <div className="element-page-container">
+      {loading && (
+        <div className="loading-overlay">
+          <Spinner animation="border" />
+        </div>
+      )}
       <BreadCrumbs
         crumbs={[
           { label: ROUTE_LABELS.ELEMENTS, path: ROUTES.ELEMENTS },
@@ -69,12 +78,10 @@ export const ElementPage: FC = () => {
           </div>
         </div>
       ) : (
-        <div className="album_page_loader_block">
-          <Spinner animation="border" />
-        </div>
+        !loading && <div>Элемент не найден</div> // Сообщение, если элемент не найден
       )}
     </div>
   );
 };
 
-export default ElementPage
+export default ElementPage;

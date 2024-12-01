@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
-import { Navbar, Nav, Container, Badge, Row, Col } from 'react-bootstrap';
+import { Navbar, Nav, Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-// import { getConfigurationElements, ConfigurationElementsResult } from './modules/configurationApi';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
 import { FilterComponent } from './components/FilterComponent';
@@ -19,6 +18,7 @@ const ElementsPage: FC = () => {
   const [category, setCategory] = useState('');
   const [minPrice, setMinPrice] = useState(1);
   const [maxPrice, setMaxPrice] = useState(100000000);
+  const [loading, setLoading] = useState(true);  // Добавляем состояние для загрузки
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,16 +31,16 @@ const ElementsPage: FC = () => {
       .then((response) => {
         // Типизируем ответ согласно ConfigurationElementsResult
         const data = response.data as ConfigurationElementsResult;
-  
+
         console.log("Полученные данные:", data);
-  
+
         // Обновляем состояние
         if (data.configuration_elements) {
           setElements(data.configuration_elements);
         } else {
           setElements([]);  // Поставим пустой массив, если элементов нет
         }
-  
+
         setDraftElementsCount(data.draft_elements_count || 0);
       })
       .catch((error) => {
@@ -48,16 +48,11 @@ const ElementsPage: FC = () => {
         // Используем моковые данные в случае ошибки
         setElements(ELEMENTS_MOCK.configuration_elements);
         setDraftElementsCount(0);
+      })
+      .finally(() => {
+        setLoading(false);  // Завершаем загрузку
       });
   }, [category, minPrice, maxPrice]);
-  
-  
-  // Проверяем, что состояние обновляется корректно
-  console.log("Elements:", elements);
-  
-  
-  
-  
 
   const handleFilterChange = (category: string, minPrice: number, maxPrice: number) => {
     setCategory(category);
@@ -69,6 +64,12 @@ const ElementsPage: FC = () => {
 
   return (
     <div className="elements-page">
+      {loading && (
+        <div className="loading-overlay">
+          <Spinner animation="border" role="status" variant="light" />
+        </div>
+      )}
+
       <Navbar className="bg-body-tertiary" expand="lg" >
         <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className='m-3'>
           <img
