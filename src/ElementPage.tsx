@@ -3,10 +3,12 @@ import { FC, useEffect, useState } from "react";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "./Routes";
 import { useParams } from "react-router-dom";
-import { ConfigurationElement, getConfigurationElementById } from "./modules/configurationApi";
+// import { ConfigurationElement, getConfigurationElementById } from "./modules/configurationApi";
 import { Spinner, Image } from "react-bootstrap";
 import defaultImage from "./assets/Default.jpeg";
 import { ELEMENTS_MOCK } from "./modules/mock";
+import { api } from "./api";
+import { ConfigurationElement } from "./api/Api";
 
 export const ElementPage: FC = () => {
   const [pageData, setPageData] = useState<ConfigurationElement>();
@@ -17,17 +19,22 @@ export const ElementPage: FC = () => {
     if (!id) return;
 
     // Попробуем получить данные с API
-    getConfigurationElementById(Number(id))
-      .then((response) => setPageData(response))
+    api.planeConfigurationElement
+    .planeConfigurationElementRead(id) // С использованием сгенерированного метода
+      .then((response) => {
+        // Извлекаем данные из response.data
+        const elementData = response.data as ConfigurationElement;
+        setPageData(elementData); // Устанавливаем данные элемента
+      })
       .catch(() => {
         // В случае ошибки или если нет интернета, используем мок
         console.error("Ошибка при загрузке данных, используется мок.");
-        
+
         // Ищем элемент с данным ID в моке
         const mockElement = ELEMENTS_MOCK.configuration_elements.find(
           (element) => element.pk === Number(id)
         );
-        
+
         // Если элемент найден в моках, устанавливаем его как данные страницы
         if (mockElement) {
           setPageData(mockElement);

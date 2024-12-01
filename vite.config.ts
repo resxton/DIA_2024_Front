@@ -15,6 +15,6 @@ export default defineConfig({
     },
     port: 3000
   },
-  base: "/DIA_2024_Front", 
+  base: "/PlaneConfigurationSystem", 
   plugins: [react()],
 })

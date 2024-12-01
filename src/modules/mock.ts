@@ -1,4 +1,4 @@
-import { ConfigurationElementsResult } from "./configurationApi";
+import { ConfigurationElementsResult } from "../api/Api";
 
 export const ELEMENTS_MOCK: ConfigurationElementsResult = {
   draft_configuration_id: 1,

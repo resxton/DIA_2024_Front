@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Navbar, Nav, Container, Badge, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { getConfigurationElements, ConfigurationElementsResult } from './modules/configurationApi';
+// import { getConfigurationElements, ConfigurationElementsResult } from './modules/configurationApi';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
 import { FilterComponent } from './components/FilterComponent';
@@ -10,17 +10,8 @@ import planeIcon from './assets/plane.svg'
 import logo from './assets/logo.svg'
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
-
-interface ConfigurationElement {
-  pk: number;
-  name: string;
-  price: number;
-  key_info: string;
-  category: string;
-  image: string;
-  detail_text: string;
-  is_deleted: boolean;
-}
+import { api } from './api'
+import { ConfigurationElementsResult, ConfigurationElement } from './api/Api';
 
 const ElementsPage: FC = () => {
   const [draftElementsCount, setDraftElementsCount] = useState(0);
@@ -31,26 +22,42 @@ const ElementsPage: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Попытка получить данные с API
-    getConfigurationElements(category, minPrice, maxPrice)
-      .then((response: ConfigurationElementsResult) => {
-        setElements(response.configuration_elements);
-        setDraftElementsCount(response.draft_elements_count);
+    api.planeConfigurationElements
+      .planeConfigurationElementsList({
+        category: category,
+        price_min: minPrice,
+        price_max: maxPrice,
+      })
+      .then((response) => {
+        // Типизируем ответ согласно ConfigurationElementsResult
+        const data = response.data as ConfigurationElementsResult;
+  
+        console.log("Полученные данные:", data);
+  
+        // Обновляем состояние
+        if (data.configuration_elements) {
+          setElements(data.configuration_elements);
+        } else {
+          setElements([]);  // Поставим пустой массив, если элементов нет
+        }
+  
+        setDraftElementsCount(data.draft_elements_count || 0);
       })
       .catch((error) => {
         console.error("Ошибка при загрузке данных:", error);
-        // В случае ошибки использовать моковые данные
-        // Фильтрация моковых данных
-        const filteredMockElements = ELEMENTS_MOCK.configuration_elements.filter(
-          (element) =>
-            element.category.includes(category) &&
-            element.price >= minPrice &&
-            element.price <= maxPrice
-        );
-        setElements(filteredMockElements);
+        // Используем моковые данные в случае ошибки
+        setElements(ELEMENTS_MOCK.configuration_elements);
         setDraftElementsCount(0);
       });
   }, [category, minPrice, maxPrice]);
+  
+  
+  // Проверяем, что состояние обновляется корректно
+  console.log("Elements:", elements);
+  
+  
+  
+  
 
   const handleFilterChange = (category: string, minPrice: number, maxPrice: number) => {
     setCategory(category);
