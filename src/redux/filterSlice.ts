@@ -36,7 +36,7 @@ const filterSlice = createSlice({
     resetFilters(state) {
       state.category = '';
       state.minPrice = 0;
-      state.maxPrice = 0;
+      state.maxPrice = 100000000;
       saveFiltersToLocalStorage(state);
     }
   }

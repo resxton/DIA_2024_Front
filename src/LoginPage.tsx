@@ -26,7 +26,7 @@ const LoginPage: FC = () => {
   
       // Сохраняем id в Redux
       dispatch(login({ username, token: "no-token", id }));
-      navigate('/'); // Перенаправление на главную страницу
+      navigate('/configuration-elements');
     } catch (error) {
       // Если ошибка, выводим в консоль
       console.error('Ошибка авторизации:', error);

@@ -65,7 +65,7 @@ const ElementsPage: FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
+    navigate('/configuration-elements');
   };
 
   return (
