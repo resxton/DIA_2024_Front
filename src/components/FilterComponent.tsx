@@ -39,7 +39,6 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     onFilterChange(category, minPrice, maxPrice);
   };
 
-  console.log("Current Filters: ", { category, minPrice, maxPrice }); // Добавьте это для отладки
 
 
   return (

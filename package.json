@@ -14,11 +14,12 @@
     "generate-api": "node scripts/generate-api.mjs"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.3.0",
+    "@reduxjs/toolkit": "^2.4.0",
     "@tauri-apps/api": "^2.1.1",
     "axios": "^1.7.8",
     "bootstrap": "^5.3.3",
     "gh-pages": "^6.2.0",
+    "js-cookie": "^3.0.5",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
     "react-dom": "^18.3.1",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@tauri-apps/cli": "^2.1.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",

@@ -3,6 +3,9 @@ import { ElementPage } from "./ElementPage";
 import ElementsPage from "./ElementsPage";
 import { ROUTES } from "./Routes";
 import { HomePage } from "./HomePage";
+import LoginPage from './LoginPage';
+import RegisterPage from './RegisterPage';
+import UserDashboardPage from './ProfilePage';
 
 function App() {
   return (
@@ -11,6 +14,9 @@ function App() {
         <Route path={ROUTES.HOME} index element={<HomePage />} />
         <Route path={ROUTES.ELEMENTS} element={<ElementsPage />} />
         <Route path={`${ROUTES.ELEMENTS}/:id`} element={<ElementPage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+        <Route path={ROUTES.USER_DASHBOARD} element={<UserDashboardPage />} />
       </Routes>
     </BrowserRouter>
   );

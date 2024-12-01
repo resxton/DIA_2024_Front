@@ -1,16 +1,18 @@
 import { FC, useState, useEffect } from 'react';
 import { Navbar, Nav, Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { ElementCard } from './components/ElementCard';
-import './ElementsPage.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, logout } from './redux/authSlice'; // Импортируем действия
 import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
-import planeIcon from './assets/plane.svg'
-import logo from './assets/logo.svg'
+import planeIcon from './assets/plane.svg';
+import logo from './assets/logo.svg';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
-import { api } from './api'
+import { api } from './api';
 import { ConfigurationElementsResult, ConfigurationElement } from './api/Api';
+import { ElementCard } from './components/ElementCard';
+import './ElementsPage.css';
 
 const ElementsPage: FC = () => {
   const [draftElementsCount, setDraftElementsCount] = useState(0);
@@ -18,8 +20,12 @@ const ElementsPage: FC = () => {
   const [category, setCategory] = useState('');
   const [minPrice, setMinPrice] = useState(1);
   const [maxPrice, setMaxPrice] = useState(100000000);
-  const [loading, setLoading] = useState(true);  // Добавляем состояние для загрузки
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Получаем состояние аутентификации из Redux
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
   useEffect(() => {
     api.planeConfigurationElements
@@ -29,28 +35,23 @@ const ElementsPage: FC = () => {
         price_max: maxPrice,
       })
       .then((response) => {
-        // Типизируем ответ согласно ConfigurationElementsResult
         const data = response.data as ConfigurationElementsResult;
 
-        console.log("Полученные данные:", data);
-
-        // Обновляем состояние
         if (data.configuration_elements) {
           setElements(data.configuration_elements);
         } else {
-          setElements([]);  // Поставим пустой массив, если элементов нет
+          setElements([]);
         }
 
         setDraftElementsCount(data.draft_elements_count || 0);
       })
       .catch((error) => {
-        console.error("Ошибка при загрузке данных:", error);
-        // Используем моковые данные в случае ошибки
+        console.error('Ошибка при загрузке данных:', error);
         setElements(ELEMENTS_MOCK.configuration_elements);
         setDraftElementsCount(0);
       })
       .finally(() => {
-        setLoading(false);  // Завершаем загрузку
+        setLoading(false);
       });
   }, [category, minPrice, maxPrice]);
 
@@ -62,6 +63,11 @@ const ElementsPage: FC = () => {
 
   const handleLogoClick = () => navigate('/');
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
+
   return (
     <div className="elements-page">
       {loading && (
@@ -70,8 +76,8 @@ const ElementsPage: FC = () => {
         </div>
       )}
 
-      <Navbar className="bg-body-tertiary" expand="lg" >
-        <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className='m-3'>
+      <Navbar className="bg-body-tertiary" expand="lg">
+        <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className="m-3">
           <img
             src={logo}
             alt="Nimbus Logo"
@@ -84,27 +90,38 @@ const ElementsPage: FC = () => {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ml-auto">
-            <Nav.Link href="configuration-elements">Элементы конфигурации</Nav.Link>
+            <Nav.Link as={Link} to={ROUTES.ELEMENTS}>{ROUTE_LABELS.ELEMENTS}</Nav.Link>
+            {!isAuthenticated ? (
+              <>
+                <Nav.Link as={Link} to={ROUTES.LOGIN}>Войти</Nav.Link>
+                <Nav.Link as={Link} to={ROUTES.REGISTER}>Зарегистрироваться</Nav.Link>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to={ROUTES.USER_DASHBOARD}>{user?.username}</Nav.Link>
+                <Nav.Link onClick={handleLogout}>Выйти</Nav.Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
 
+
       <BreadCrumbs
         crumbs={[
-          { label: ROUTE_LABELS.ELEMENTS, path: ROUTES.ELEMENTS }
+          { label: ROUTE_LABELS.ELEMENTS, path: ROUTES.ELEMENTS },
         ]}
       />
 
       <Container fluid className="mt-4 w-75">
-        <h2 className='mb-4'>Элементы конфигурации</h2>
-        
-        {/* Фильтр и корзина */}
+        <h2 className="mb-4">Элементы конфигурации</h2>
+
         <div className="filter-cart-container">
-          <FilterComponent 
-            selectedCategory={category} 
-            selectedPriceMin={minPrice} 
-            selectedPriceMax={maxPrice} 
-            onFilterChange={handleFilterChange} 
+          <FilterComponent
+            selectedCategory={category}
+            selectedPriceMin={minPrice}
+            selectedPriceMax={maxPrice}
+            onFilterChange={handleFilterChange}
           />
           <div className="cart-icon" onClick={() => navigate('')}>
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
@@ -113,8 +130,7 @@ const ElementsPage: FC = () => {
             </Badge>
           </div>
         </div>
-        
-        {/* Проверяем, есть ли элементы для отображения */}
+
         {elements.length > 0 ? (
           <Row className="w-100">
             {elements.map((element) => (

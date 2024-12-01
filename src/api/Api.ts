@@ -803,6 +803,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         ...params,
       }),
+
+      /**
+       * @description Метод для получения ID пользователя по логину.
+       *
+       * @tags user
+       * @name UserGetIdByUsername
+       * @request GET:/user/get-id-by-username
+       * @secure
+       */
+      userGetIdByUsername: (username: string, params: RequestParams = {}) =>
+      this.request<{ id: number }, any>({
+        path: `/user/get-id-by-username`,
+        method: "GET",
+        query: { username },
+        secure: true,
+        format: "json",
+        ...params,
+      }),
   };
   users = {
     /**
