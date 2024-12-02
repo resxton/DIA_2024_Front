@@ -390,7 +390,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   };
   login = {
     /**
-     * No description
+     * Вход в систему.
      *
      * @tags login
      * @name LoginCreate
@@ -410,6 +410,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: data,
         secure: true,
+        withCredentials: true,  // Включаем отправку кук
         type: ContentType.Json,
         ...params,
       }),
@@ -549,7 +550,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/plane_configuration_element/{id}/
      * @secure
      */
-    planeConfigurationElementCreate: (id: string, params: RequestParams = {}) =>
+    planeConfigurationElementCreate: (id: number, params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/plane_configuration_element/${id}/`,
         method: "POST",

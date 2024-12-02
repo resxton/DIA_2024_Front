@@ -64,9 +64,21 @@ const ElementsPage: FC = () => {
   const handleLogoClick = () => navigate('/');
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate('/configuration-elements');
+    api.logout
+      .logoutCreate()
+      .then(() => {
+        // Очистка кук на клиенте
+        document.cookie = "sessionid=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";  // Удаление sessionid
+  
+        dispatch(logout());
+        navigate('/configuration-elements');
+      })
+      .catch((error) => {
+        console.error('Ошибка при выходе из системы:', error);
+      });
   };
+  
+  
 
   return (
     <div className="elements-page">

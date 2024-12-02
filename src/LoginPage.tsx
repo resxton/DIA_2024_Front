@@ -20,7 +20,7 @@ const LoginPage: FC = () => {
   
       // Запрос на получение id пользователя по username
       const userResponse = await api.user.userGetIdByUsername(username);
-      console.log(username)
+      console.log(username);
   
       const id = userResponse.data.id;
   
@@ -28,7 +28,6 @@ const LoginPage: FC = () => {
       dispatch(login({ username, token: "no-token", id }));
       navigate('/configuration-elements');
     } catch (error) {
-      // Если ошибка, выводим в консоль
       console.error('Ошибка авторизации:', error);
     }
   };
