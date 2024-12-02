@@ -1,18 +1,19 @@
 import { FC, useState, useEffect } from 'react';
-import { Navbar, Nav, Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, logout } from './redux/authSlice'; // Импортируем действия
+import { logout } from './redux/authSlice'; // Импортируем действия
 import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
 import planeIcon from './assets/plane.svg';
-import logo from './assets/logo.svg';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { api } from './api';
 import { ConfigurationElementsResult, ConfigurationElement } from './api/Api';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
+import { resetFilters } from './redux/filterSlice';
+import CustomNavbar from './components/CustomNavbar';
 
 const ElementsPage: FC = () => {
   const [draftElementsCount, setDraftElementsCount] = useState(0);
@@ -21,10 +22,10 @@ const ElementsPage: FC = () => {
   const [minPrice, setMinPrice] = useState(1);
   const [maxPrice, setMaxPrice] = useState(100000000);
   const [loading, setLoading] = useState(true);
+  const [draftID, setDraftID] = useState(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Получаем состояние аутентификации из Redux
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
   useEffect(() => {
@@ -36,14 +37,13 @@ const ElementsPage: FC = () => {
       })
       .then((response) => {
         const data = response.data as ConfigurationElementsResult;
-
         if (data.configuration_elements) {
           setElements(data.configuration_elements);
         } else {
           setElements([]);
         }
-
         setDraftElementsCount(data.draft_elements_count || 0);
+        setDraftID(data.draft_configuration_id || 0);
       })
       .catch((error) => {
         console.error('Ошибка при загрузке данных:', error);
@@ -67,11 +67,12 @@ const ElementsPage: FC = () => {
     api.logout
       .logoutCreate()
       .then(() => {
-        // Очистка кук на клиенте
-        document.cookie = "sessionid=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";  // Удаление sessionid
+        dispatch(logout()); // Логаут пользователя
+        dispatch(resetFilters()); // Сброс фильтров в Redux
   
-        dispatch(logout());
-        navigate('/configuration-elements');
+        setDraftElementsCount(0); // Сбрасываем количество элементов в корзине
+  
+        navigate('/configuration-elements'); // Перенаправление на нужную страницу
       })
       .catch((error) => {
         console.error('Ошибка при выходе из системы:', error);
@@ -79,6 +80,17 @@ const ElementsPage: FC = () => {
   };
   
   
+
+  // Функция для обновления количества элементов в корзине
+  const handleAddToDraft = () => {
+    setDraftElementsCount(prevCount => prevCount + 1);
+  };
+
+  const handleGoToDraft = () => {
+    if (draftID) {
+      navigate(`/configuration/${draftID}`);
+    }
+  };
 
   return (
     <div className="elements-page">
@@ -88,36 +100,11 @@ const ElementsPage: FC = () => {
         </div>
       )}
 
-      <Navbar className="bg-body-tertiary" expand="lg">
-        <Navbar.Brand onClick={handleLogoClick} style={{ cursor: 'pointer' }} className="m-3">
-          <img
-            src={logo}
-            alt="Nimbus Logo"
-            width={30}
-            height={30}
-            className="d-inline-block align-top"
-          />{' '}
-          Nimbus
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbar-nav" />
-        <Navbar.Collapse id="navbar-nav">
-          <Nav className="ml-auto">
-            <Nav.Link as={Link} to={ROUTES.ELEMENTS}>{ROUTE_LABELS.ELEMENTS}</Nav.Link>
-            {!isAuthenticated ? (
-              <>
-                <Nav.Link as={Link} to={ROUTES.LOGIN}>Войти</Nav.Link>
-                <Nav.Link as={Link} to={ROUTES.REGISTER}>Зарегистрироваться</Nav.Link>
-              </>
-            ) : (
-              <>
-                <Nav.Link as={Link} to={ROUTES.USER_DASHBOARD}>{user?.username}</Nav.Link>
-                <Nav.Link onClick={handleLogout}>Выйти</Nav.Link>
-              </>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-
+      <CustomNavbar
+        isAuthenticated={isAuthenticated}
+        user={user}
+        onLogout={handleLogout}
+      />
 
       <BreadCrumbs
         crumbs={[
@@ -135,9 +122,13 @@ const ElementsPage: FC = () => {
             selectedPriceMax={maxPrice}
             onFilterChange={handleFilterChange}
           />
-          <div className="cart-icon" onClick={() => navigate('')}>
+          <div
+            className="cart-icon"
+            onClick={handleGoToDraft}
+            style={{ cursor: isAuthenticated ? 'pointer' : 'not-allowed' }}
+          >
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
-            <Badge pill bg="primary" className="draft-count-badge">
+            <Badge pill bg={isAuthenticated ? 'primary' : 'danger'} className="draft-count-badge">
               {draftElementsCount}
             </Badge>
           </div>
@@ -154,6 +145,7 @@ const ElementsPage: FC = () => {
                   category={element.category}
                   image={element.image}
                   detail_text={element.detail_text}
+                  onAddToDraft={handleAddToDraft}
                 />
               </Col>
             ))}

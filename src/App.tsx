@@ -6,6 +6,7 @@ import { HomePage } from "./HomePage";
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import UserDashboardPage from './ProfilePage';
+import ConfigurationPage from "./ConfigurationPage";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={ROUTES.USER_DASHBOARD} element={<UserDashboardPage />} />
+        <Route path={`${ROUTES.CONFIGURATION}/:id`} element={<ConfigurationPage />} />
+
       </Routes>
     </BrowserRouter>
   );

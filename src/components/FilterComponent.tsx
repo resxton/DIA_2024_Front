@@ -12,24 +12,22 @@ interface FilterComponentProps {
 }
 
 export const FilterComponent: React.FC<FilterComponentProps> = ({ 
+  selectedCategory, // Добавлено
+  selectedPriceMin, // Добавлено
+  selectedPriceMax, // Добавлено
   onFilterChange 
 }) => {
-  // const [category, setCategory] = useState(selectedCategory || '');
-  // const [minPrice, setMinPrice] = useState(selectedPriceMin);
-  // const [maxPrice, setMaxPrice] = useState(selectedPriceMax);
-
   const dispatch = useDispatch();
   const { category, minPrice, maxPrice } = useSelector((state: RootState) => state.filter);
-
 
   const handleCategorySelect = (category: string) => {
     dispatch(setCategory(category));
   };
-  
+
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setMinPrice(Number(e.target.value)));
   };
-  
+
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setMaxPrice(Number(e.target.value)));
   };
@@ -38,8 +36,6 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     e.preventDefault();
     onFilterChange(category, minPrice, maxPrice);
   };
-
-
 
   return (
     <Form onSubmit={handleSubmit} className="filter-form mb-4">

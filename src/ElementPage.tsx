@@ -3,48 +3,55 @@ import { FC, useEffect, useState } from "react";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "./Routes";
 import { useParams } from "react-router-dom";
-// import { ConfigurationElement, getConfigurationElementById } from "./modules/configurationApi";
-import { Spinner, Image } from "react-bootstrap";
+import { Spinner, Image, Button } from "react-bootstrap";
 import defaultImage from "./assets/Default.jpeg";
 import { ELEMENTS_MOCK } from "./modules/mock";
 import { api } from "./api";
 import { ConfigurationElement } from "./api/Api";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./redux/store"; // импортируйте RootState вашего Redux хранилища
 
 export const ElementPage: FC = () => {
   const [pageData, setPageData] = useState<ConfigurationElement>();
-  const [loading, setLoading] = useState(true); // Добавим состояние загрузки
+  const [loading, setLoading] = useState(true);
 
   const { id } = useParams(); // Получаем ID страницы
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth); // Получаем данные аутентификации из Redux
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!id) return;
 
     // Попробуем получить данные с API
     api.planeConfigurationElement
-      .planeConfigurationElementRead(id) // С использованием сгенерированного метода
+      .planeConfigurationElementRead(id)
       .then((response) => {
-        // Извлекаем данные из response.data
         const elementData = response.data as ConfigurationElement;
-        setPageData(elementData); // Устанавливаем данные элемента
+        setPageData(elementData);
       })
       .catch(() => {
-        // В случае ошибки или если нет интернета, используем мок
         console.error("Ошибка при загрузке данных, используется мок.");
-
-        // Ищем элемент с данным ID в моке
         const mockElement = ELEMENTS_MOCK.configuration_elements.find(
           (element) => element.pk === Number(id)
         );
-
-        // Если элемент найден в моках, устанавливаем его как данные страницы
         if (mockElement) {
           setPageData(mockElement);
         }
       })
       .finally(() => {
-        setLoading(false); // После загрузки данных выключаем индикатор загрузки
+        setLoading(false);
       });
   }, [id]);
+
+  const handleAddToConfiguration = () => {
+    if (isAuthenticated) {
+      console.log("Элемент добавлен в конфигурацию");
+      // Логика добавления элемента в конфигурацию
+    } else {
+      console.log("Пользователь не авторизован");
+    }
+  };
 
   return (
     <div className="element-page-container">
@@ -75,10 +82,17 @@ export const ElementPage: FC = () => {
             <h2 className="detail-card-price">
               Стоимость: ${pageData.price || "N/A"}
             </h2>
+            {isAuthenticated ? (
+              <Button variant="primary" onClick={handleAddToConfiguration}>
+                Добавить в конфигурацию
+              </Button>
+            ) : (
+              <p>Для добавления в конфигурацию необходимо авторизоваться.</p>
+            )}
           </div>
         </div>
       ) : (
-        !loading && <div>Элемент не найден</div> // Сообщение, если элемент не найден
+        !loading && <div>Элемент не найден</div>
       )}
     </div>
   );

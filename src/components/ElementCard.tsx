@@ -5,7 +5,6 @@ import './ElementCard.css';
 import { api } from '../api';
 import axios, { AxiosError } from 'axios';
 
-
 interface Props {
   id: number;
   name: string;
@@ -13,9 +12,19 @@ interface Props {
   category: string;
   image?: string;
   detail_text: string;
+  onAddToDraft: () => void;  // Функция для обновления количества
+  showAddButton?: boolean;  // Новый пропс для контроля отображения кнопки
 }
 
-export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => {
+export const ElementCard: FC<Props> = ({
+  id,
+  name,
+  price,
+  category,
+  image,
+  onAddToDraft,
+  showAddButton = true,  // По умолчанию кнопка отображается
+}) => {
 
   const handleAddToDraft = async (id: number) => {
     try {
@@ -25,10 +34,10 @@ export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => 
       });
       console.log("Элемент успешно добавлен:", response);
       alert("Элемент добавлен в заявку");
+      onAddToDraft();  // Обновляем количество в корзине
     } catch (error: unknown) {
       console.error("Ошибка при добавлении элемента:", error);
   
-      // Если ошибка типа AxiosError, обрабатываем её
       if (axios.isAxiosError(error)) {
         switch (error.response?.status) {
           case 400:
@@ -48,8 +57,6 @@ export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => 
       }
     }
   };
-  
-  
 
   const handleMoreInfoClick = () => {
     window.location.href = `configuration-elements/${id}`;
@@ -75,9 +82,11 @@ export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => 
           <Card.Text>Цена: $ {price}</Card.Text>
         </div>
         <div className="d-flex justify-content-between mt-3">
-          <Button variant="success" onClick={() => handleAddToDraft(id)}>
-            Добавить в заявку
-          </Button>
+          {showAddButton && (
+            <Button variant="success" onClick={() => handleAddToDraft(id)}>
+              Добавить в заявку
+            </Button>
+          )}
           <Button variant="primary" onClick={handleMoreInfoClick} className="me-2">
             Подробнее
           </Button>
@@ -86,3 +95,6 @@ export const ElementCard: FC<Props> = ({ id, name, price, category, image }) => 
     </Card>
   );
 };
+
+
+export default ElementCard;

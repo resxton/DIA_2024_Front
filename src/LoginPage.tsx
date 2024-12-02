@@ -15,25 +15,34 @@ const LoginPage: FC = () => {
 
   const handleLogin = async () => {
     try {
-      // Отправляем данные на сервер для авторизации
+      // Send data to the server for authentication
       const response = await api.login.loginCreate({ username, password });
   
-      // Запрос на получение id пользователя по username
+      // Request to get user id by username
       const userResponse = await api.user.userGetIdByUsername(username);
       console.log(username);
   
       const id = userResponse.data.id;
   
-      // Сохраняем id в Redux
+      // Save id in Redux
       dispatch(login({ username, token: "no-token", id }));
       navigate('/configuration-elements');
     } catch (error) {
       console.error('Ошибка авторизации:', error);
     }
   };
-  
-  
-  
+
+  const handleAdminLogin = () => {
+    setUsername('admin');
+    setPassword('admin');
+    handleLogin();
+  };
+
+  const handleKirillLogin = () => {
+    setUsername('kirill');
+    setPassword('kirill');
+    handleLogin();
+  };
 
   return (
     <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
@@ -70,6 +79,15 @@ const LoginPage: FC = () => {
               <Button variant="primary" onClick={handleLogin} className="w-100 mt-4">
                 Войти
               </Button>
+
+              <div className="d-flex justify-content-between mt-3">
+                <Button variant="secondary" onClick={handleAdminLogin}>
+                  Войти как admin
+                </Button>
+                <Button variant="secondary" onClick={handleKirillLogin}>
+                  Войти как kirill
+                </Button>
+              </div>
             </Form>
           </div>
         </Col>

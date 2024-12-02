@@ -80,6 +80,10 @@ export interface Configuration {
   /** User */
   user?: string;
 }
+export interface PlaneConfigurationResponse {
+  configuration: Configuration;
+  configuration_elements: ConfigurationElement[];
+}
 
 export interface ConfigurationElement {
   /** ID */
@@ -434,22 +438,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
   };
   planeConfiguration = {
-    /**
-     * No description
-     *
-     * @tags plane_configuration
-     * @name PlaneConfigurationRead
-     * @summary Получить конфигурацию по идентификатору с её элементами и изображениями
-     * @request GET:/plane_configuration/{id}/
-     * @secure
-     */
-    planeConfigurationRead: (id: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/plane_configuration/${id}/`,
-        method: "GET",
-        secure: true,
-        ...params,
-      }),
+  /**
+   * Получить конфигурацию по идентификатору с её элементами и изображениями
+   *
+   * @tags plane_configuration
+   * @name PlaneConfigurationRead
+   * @summary Получить конфигурацию по идентификатору с её элементами и изображениями
+   * @request GET:/plane_configuration/{id}/
+   * @secure
+   */
+  planeConfigurationRead: (id: string, params: RequestParams = {}) =>
+    this.request<PlaneConfigurationResponse, any>({
+      path: `/plane_configuration/${id}/`,
+      method: "GET",
+      secure: true,
+      ...params,
+    }),
+
 
     /**
      * No description
