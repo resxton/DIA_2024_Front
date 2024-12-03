@@ -4,6 +4,7 @@ import defaultImage from "../assets/Default.jpeg";
 import './ElementCard.css';
 import { api } from '../api';
 import axios, { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   id: number;
@@ -58,8 +59,10 @@ export const ElementCard: FC<Props> = ({
     }
   };
 
+  const navigate = useNavigate();
+
   const handleMoreInfoClick = () => {
-    window.location.href = `configuration-elements/${id}`;
+    navigate(`/configuration-elements/${id}`);
   };
 
   return (

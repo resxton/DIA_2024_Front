@@ -6,7 +6,8 @@ export const ROUTES = {
 	REGISTER: "/register", // Страница регистрации
 	USER_DASHBOARD: "/account", // Личный кабинет пользователя
 	USER_APPLICATIONS: "/my-configurations", // Страница заявок пользователя
-	CONFIGURATION: "/configuration"
+	CONFIGURATION: "/configuration",
+	CONFIGURATIONS: "/configurations",
   };
   
   export type RouteKeyType = keyof typeof ROUTES;
@@ -18,6 +19,7 @@ export const ROUTES = {
 	REGISTER: "Регистрация", // Подпись для страницы регистрации
 	USER_DASHBOARD: "Личный кабинет", // Подпись для личного кабинета
 	USER_APPLICATIONS: "Мои заявки", // Подпись для страницы с заявками пользователя
-	CONFIGURATION: "Текущая конфигурация"
+	CONFIGURATION: "Текущая конфигурация",
+	CONFIGURATIONS: "Ваши конфигурации"
   };
   

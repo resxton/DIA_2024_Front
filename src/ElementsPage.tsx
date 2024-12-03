@@ -61,8 +61,6 @@ const ElementsPage: FC = () => {
     setMaxPrice(maxPrice);
   };
 
-  const handleLogoClick = () => navigate('/');
-
   const handleLogout = () => {
     api.logout
       .logoutCreate()
@@ -79,8 +77,6 @@ const ElementsPage: FC = () => {
       });
   };
   
-  
-
   // Функция для обновления количества элементов в корзине
   const handleAddToDraft = () => {
     setDraftElementsCount(prevCount => prevCount + 1);

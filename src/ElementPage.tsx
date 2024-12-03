@@ -82,13 +82,6 @@ export const ElementPage: FC = () => {
             <h2 className="detail-card-price">
               Стоимость: ${pageData.price || "N/A"}
             </h2>
-            {isAuthenticated ? (
-              <Button variant="primary" onClick={handleAddToConfiguration}>
-                Добавить в конфигурацию
-              </Button>
-            ) : (
-              <p>Для добавления в конфигурацию необходимо авторизоваться.</p>
-            )}
           </div>
         </div>
       ) : (

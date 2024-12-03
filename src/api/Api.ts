@@ -24,11 +24,23 @@ export interface ConfigurationMap {
   element: number;
 }
 
+export interface PlaneConfigurationListResponse {
+  configurations: Array<{
+    pk: number;
+    name: string;
+    status: string;
+    created_at: string; // Дата создания в строковом формате (например, ISO 8601)
+    creator: string | null; // Имя пользователя создателя
+    moderator: string | null; // Имя пользователя модератора
+    [key: string]: any; // Для других возможных полей, которые могут быть в ответе
+  }>;
+}
+
 export interface Configuration {
   /** ID */
-  pk?: number;
+  pk: number;
   /** Status */
-  status?: "draft" | "deleted" | "created" | "completed" | "rejected";
+  status: "draft" | "deleted" | "created" | "completed" | "rejected";
   /**
    * Created at
    * @format date-time
@@ -83,6 +95,7 @@ export interface Configuration {
 export interface PlaneConfigurationResponse {
   configuration: Configuration;
   configuration_elements: ConfigurationElement[];
+  counts: number[];
 }
 
 export interface ConfigurationElement {
@@ -348,24 +361,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags configuration_map
      * @name ConfigurationMapUpdate
      * @summary Обновить количество элемента в конфигурации
-     * @request PUT:/configuration_map/
+     * @request PUT:/configuration_map/{configuration_id}/{element_id}/
      * @secure
      */
     configurationMapUpdate: (
       data: {
         count?: number;
       },
+      configurationId: number,  // Параметр для конфигурации
+      elementId: number,  // Параметр для элемента
       params: RequestParams = {},
     ) =>
       this.request<ConfigurationMap, void>({
-        path: `/configuration_map/`,
+        path: `/configuration_map/`,  // Путь без ID
         method: "PUT",
-        body: data,
+        body: data,  // Тело запроса передает count
         secure: true,
         type: ContentType.Json,
         format: "json",
-        ...params,
+        query: {
+          configuration_id: configurationId,  // Параметр query для конфигурации
+          element_id: elementId,  // Параметр query для элемента
+          ...params,  // Добавляем другие параметры запроса
+        },
       }),
+    
+    
+    
 
     /**
      * No description
@@ -437,6 +459,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  planeConfigurations = {
+    /**
+     * Получить список конфигураций с возможностью фильтрации по статусу и дате создания
+     *
+     * @tags plane_configuration
+     * @name PlaneConfigurationList
+     * @summary Получить список конфигураций с фильтрацией
+     * @request GET:/plane_configuration/
+     * @secure
+     */
+    planeConfigurationList: (query: { status?: string; created_after?: string; created_before?: string } = {}, params: RequestParams = {}) =>
+      this.request<PlaneConfigurationListResponse, any>({
+        path: "/plane_configurations/",
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      })
+    }
+
   planeConfiguration = {
   /**
    * Получить конфигурацию по идентификатору с её элементами и изображениями
@@ -687,24 +729,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
-  planeConfigurations = {
-    /**
-     * No description
-     *
-     * @tags plane_configurations
-     * @name PlaneConfigurationsList
-     * @summary Получить список конфигураций с возможностью фильтрации по статусу и дате создания
-     * @request GET:/plane_configurations/
-     * @secure
-     */
-    planeConfigurationsList: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/plane_configurations/`,
-        method: "GET",
-        secure: true,
-        ...params,
-      }),
-  };
+
   user = {
     /**
      * @description Класс, описывающий методы работы с пользователями. Осуществляет связь с таблицей пользователей в базе данных.
