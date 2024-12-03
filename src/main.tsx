@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')!).render(
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/DIA_2024_Front/serviceWorker.js')
+      .register('/PlaneConfigurationSystem/serviceWorker.js')
       .then((registration) => {
         console.log('Service Worker зарегистрирован: ', registration);
       })

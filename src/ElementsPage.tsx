@@ -43,9 +43,9 @@ const ElementsPage: FC = () => {
         // Фильтрация моковых данных
         const filteredMockElements = ELEMENTS_MOCK.configuration_elements.filter(
           (element) =>
-            element.category.includes(category) &&
-            element.price >= minPrice &&
-            element.price <= maxPrice
+            (!category || element.category === category) && // Проверяем категорию
+            element.price >= minPrice && // Проверяем минимальную цену
+            element.price <= maxPrice    // Проверяем максимальную цену
         );
         setElements(filteredMockElements);
         setDraftElementsCount(0);
