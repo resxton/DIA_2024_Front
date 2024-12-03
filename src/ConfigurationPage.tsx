@@ -19,6 +19,7 @@ const ConfigurationPage: FC = () => {
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
+  const [configurationStatus, setConfigurationStatus] = useState<string>('');
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();  // Инициализируем navigate
@@ -63,6 +64,7 @@ const ConfigurationPage: FC = () => {
         setCustomerEmail(data.configuration.customer_email || "")
         setCustomerName(data.configuration.customer_name || "")
         setCustomerPhone(data.configuration.customer_phone || "")
+        setConfigurationStatus(data.configuration.status || "")
       })
       .catch((error) => {
         console.error('Ошибка при загрузке конфигурации:', error);
@@ -158,6 +160,7 @@ const ConfigurationPage: FC = () => {
       .then(() => {
         alert('Заявка успешно оформлена');
         setLoading(false);
+        navigate(ROUTES.ELEMENTS);  // Переход к роуту /elements (или другой путь, если нужно)
       })
       .catch((error) => {
         console.error('Ошибка при обновлении конфигурации:', error);
@@ -310,46 +313,51 @@ const ConfigurationPage: FC = () => {
                         showAddButton={false}
                       />
                     </Col>
-                  
+
                     {/* Блок управления количеством */}
-                    <Col xs={12} md={4} className="d-flex flex-column align-items-start justify-content-center ps-md-5">
-                      <div className="quantity-control d-flex align-items-center gap-3 p-3 border rounded shadow-sm bg-light w-100">
-                        {/* Кнопка уменьшения количества */}
-                        <Button 
-                          variant="outline-secondary" 
-                          onClick={() => handleUpdateQuantity(element.pk, 'decrement')}
-                          size="lg"
-                          className="quantity-btn"
-                        >
-                          -
-                        </Button>
+                      {configuration.configuration.status === 'draft' && (
+                        <Col xs={12} md={4} className="d-flex flex-column align-items-start justify-content-center ps-md-5">
+                          <div className="quantity-control d-flex align-items-center gap-3 p-3 border rounded shadow-sm bg-light w-100">
+                            {/* Кнопка уменьшения количества */}
+                            <Button 
+                              variant="outline-secondary" 
+                              onClick={() => handleUpdateQuantity(element.pk, 'decrement')}
+                              size="lg"
+                              className="quantity-btn"
+                            >
+                              -
+                            </Button>
+
+                            {/* Отображение количества */}
+                            <span className="badge text-black px-2 py-3 fs-5">
+                              {configuration.counts[index] || 0}
+                            </span>
+
+                            {/* Кнопка увеличения количества */}
+                            <Button 
+                              variant="outline-secondary" 
+                              onClick={() => handleUpdateQuantity(element.pk, 'increment')}
+                              size="lg"
+                              className="quantity-btn"
+                            >
+                              +
+                            </Button>
+                          </div>
+
+                          {/* Кнопка удаления элемента */}
+                          <Button 
+                            variant="danger" 
+                            onClick={() => handleDeleteElement(element.pk)}
+                            className="mt-3 w-100"
+                            size="lg"
+                          >
+                            Удалить
+                          </Button>
+                        </Col>
+                      )}
+
                   
-                        {/* Отображение количества */}
-                        <span className="badge text-black px-2 py-3 fs-5">
-                          {configuration.counts[index] || 0}
-                        </span>
-                  
-                        {/* Кнопка увеличения количества */}
-                        <Button 
-                          variant="outline-secondary" 
-                          onClick={() => handleUpdateQuantity(element.pk, 'increment')}
-                          size="lg"
-                          className="quantity-btn"
-                        >
-                          +
-                        </Button>
-                      </div>
-                  
-                      {/* Кнопка удаления элемента */}
-                      <Button 
-                        variant="danger" 
-                        onClick={() => handleDeleteElement(element.pk)}
-                        className="mt-3 w-100"
-                        size="lg"
-                      >
-                        Удалить
-                      </Button>
-                    </Col>
+                    
                   </Row>
                                     
                   ))}
@@ -359,9 +367,14 @@ const ConfigurationPage: FC = () => {
               )}
             </Col>
 
-            <Button variant="primary" onClick={handleSubmit} className='m-2'>Оформить заявку</Button>
-            <Button variant="warning" onClick={() => handleEditConfiguration()} className='m-2'>Изменить заявку</Button>
-            <Button variant="danger" onClick={() => handleDeleteConfiguration(configuration.configuration.pk)} className='m-2'>Удалить заявку</Button>
+            {configuration.configuration.status === 'draft' && (
+              <div>
+                <Button variant="primary" onClick={handleSubmit} className="m-2">Подтвердить конфигурацию</Button>
+                <Button variant="warning" onClick={() => handleEditConfiguration()} className="m-2">Изменить конфигурацию</Button>
+                <Button variant="danger" onClick={() => handleDeleteConfiguration(configuration.configuration.pk)} className="m-2">Удалить конфигурацию</Button>
+              </div>
+            )}
+
           </>
         ) : (
           <p>Конфигурация не найдена.</p>

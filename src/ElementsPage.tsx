@@ -80,6 +80,7 @@ const ElementsPage: FC = () => {
   // Функция для обновления количества элементов в корзине
   const handleAddToDraft = () => {
     setDraftElementsCount(prevCount => prevCount + 1);
+    window.location.reload();
   };
 
   const handleGoToDraft = () => {
@@ -121,7 +122,7 @@ const ElementsPage: FC = () => {
           <div
             className="cart-icon"
             onClick={handleGoToDraft}
-            style={{ cursor: isAuthenticated ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: isAuthenticated ? 'pointer' : 'normal' }}
           >
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
             <Badge pill bg={isAuthenticated ? 'primary' : 'danger'} className="draft-count-badge">
