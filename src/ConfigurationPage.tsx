@@ -1,10 +1,10 @@
 import { FC, useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Button, Row, Col, Spinner, Card, Form, Modal } from 'react-bootstrap';
 import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
-import { PlaneConfigurationResponse, ConfigurationElement } from './api/Api';
+import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './redux/store';
 import { logout } from './redux/authSlice';
@@ -16,11 +16,13 @@ const ConfigurationPage: FC = () => {
   const { id } = useParams(); // Get configuration ID from the URL
   const [configuration, setConfiguration] = useState<PlaneConfigurationResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [elementToDelete, setElementToDelete] = useState<number | null>(null);
-  const [action, setAction] = useState<'increment' | 'decrement' | null>(null);
+  const [customerPhone, setCustomerPhone] = useState<string>('');
+  const [customerName, setCustomerName] = useState<string>('');
+  const [customerEmail, setCustomerEmail] = useState<string>('');
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();  // Инициализируем navigate
+
 
   // Access authentication state from Redux store
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -43,10 +45,6 @@ const ConfigurationPage: FC = () => {
   }, [id]);
   
 
-  const handleSubmit = () => {
-    console.log('Заявка оформлена');
-  };
-
   useEffect(() => {
     if (!id) return;
   
@@ -62,6 +60,9 @@ const ConfigurationPage: FC = () => {
         }
   
         setConfiguration(data);
+        setCustomerEmail(data.configuration.customer_email || "")
+        setCustomerName(data.configuration.customer_name || "")
+        setCustomerPhone(data.configuration.customer_phone || "")
       })
       .catch((error) => {
         console.error('Ошибка при загрузке конфигурации:', error);
@@ -82,24 +83,111 @@ const ConfigurationPage: FC = () => {
     );
   
     if (elementIndex !== -1) {
-      const newCount = action === 'increment' ? updatedCounts[elementIndex] + 1 : updatedCounts[elementIndex] - 1;
+      let newCount = action === 'increment' ? updatedCounts[elementIndex] + 1 : updatedCounts[elementIndex] - 1;
   
-      // Вызов API для обновления количества
-      api.configurationMap.configurationMapUpdate({ count: newCount }, configuration.configuration.pk, elementId)
-        .then(() => {
-          updatedCounts[elementIndex] = newCount;  // Обновляем локально
-          window.location.reload();  // Перезагружаем страницу
-        })
-        .catch((error) => {
-          console.error('Ошибка при обновлении количества:', error);
-        });
+      // Если количество уменьшилось до 0, вызываем удаление
+      if (newCount <= 0) {
+        api.configurationMap.configurationMapDelete(configuration.configuration.pk, elementId)
+          .then(() => {
+            updatedCounts[elementIndex] = 0; // Обновляем количество в локальном состоянии
+            window.location.reload(); // Перезагружаем страницу после удаления
+          })
+          .catch((error) => {
+            console.error('Ошибка при удалении элемента:', error);
+          });
+      } else {
+        // Если количество больше 0, просто обновляем
+        updatedCounts[elementIndex] = newCount;
+  
+        // Вызов API для обновления количества
+        api.configurationMap.configurationMapUpdate({ count: newCount }, configuration.configuration.pk, elementId)
+          .then(() => {
+            window.location.reload();  // Перезагружаем страницу после обновления
+          })
+          .catch((error) => {
+            console.error('Ошибка при обновлении количества:', error);
+          });
+      }
     }
   };
   
+
+  const handleDeleteElement = (elementId: number) => {
+    if (!configuration) return;  // Проверка на наличие конфигурации
   
+    api.configurationMap.configurationMapDelete(configuration.configuration.pk, elementId)
+      .then(() => {
+        // Удаление элемента из локального состояния
+        const updatedConfiguration = {
+          ...configuration,
+          configuration_elements: configuration.configuration_elements.filter(
+            (element) => element.pk !== elementId
+          ),
+          counts: configuration.counts.filter((_, index) => index !== elementId), // Удаляем соответствующий элемент из counts
+        };
   
-  
- 
+        setConfiguration(updatedConfiguration); // Обновляем состояние
+      })
+      .catch((error) => {
+        console.error('Ошибка при удалении элемента:', error);
+      });
+  };  
+
+
+  const handleDeleteConfiguration = (configurationId: number) => {
+    api.planeConfiguration.planeConfigurationDelete(configurationId)
+      .then(() => {
+        // Редирект на страницу с элементами
+        navigate(ROUTES.ELEMENTS);  // Переход к роуту /elements (или другой путь, если нужно)
+
+        // Здесь можно добавить уведомление об успешном удалении
+        alert('Конфигурация успешно удалена.');
+      })
+      .catch((error) => {
+        // Обрабатываем ошибку удаления
+        console.error('Ошибка при удалении конфигурации:', error);
+        alert('Не удалось удалить конфигурацию.');
+      });
+  };
+
+  const handleSubmit = () => {
+    if (!id || !configuration) return;
+
+    api.planeConfiguration
+      .planeConfigurationSubmitUpdate(id)
+      .then(() => {
+        alert('Заявка успешно оформлена');
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Ошибка при обновлении конфигурации:', error);
+        alert('Не удалось обновить конфигурацию');
+      });
+  };
+
+
+  const handleEditConfiguration = () => {
+    if (!id || !configuration) return;
+
+    const updatedConfiguration: Configuration = {
+      ...configuration.configuration,
+      customer_name: customerName,
+      customer_phone: customerPhone,  // Обновленный номер телефона
+      customer_email: customerEmail,  // Обновленный email
+    };
+
+    api.planeConfiguration
+      .planeConfigurationUpdate(id, updatedConfiguration)  // Используем новый метод обновления
+      .then(() => {
+        alert('Заявка успешно изменена');
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Ошибка при изменении конфигурации:', error);
+        alert('Не удалось изменить конфигурацию');
+      });
+};
+
 
   if (loading) {
     return <Spinner animation="border" role="status" variant="light" />;
@@ -164,13 +252,21 @@ const ConfigurationPage: FC = () => {
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Покупатель</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.customer_name || ""} disabled/>
+                          <Form.Control 
+                            type="text" 
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                          />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Номер телефона</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.customer_phone || ""} disabled/>
+                          <Form.Control
+                            type="text"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                          />
                         </Form.Group>
                       </Col>
                     </Row>
@@ -179,13 +275,17 @@ const ConfigurationPage: FC = () => {
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Email</Form.Label>
-                          <Form.Control type="email" value={configuration.configuration.customer_email || ""} disabled/>
+                          <Form.Control
+                            type="email"
+                            value={customerEmail}
+                            onChange={(e) => setCustomerEmail(e.target.value)}
+                          />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Итоговая стоимость</Form.Label>
-                          <Form.Control type="text" value={`$ ${configuration.configuration.total_price }`} disabled />
+                          <Form.Control type="text" value={`$ ${configuration.configuration.total_price}`} disabled />
                         </Form.Group>
                       </Col>
                     </Row>
@@ -243,7 +343,7 @@ const ConfigurationPage: FC = () => {
                       {/* Кнопка удаления элемента */}
                       <Button 
                         variant="danger" 
-
+                        onClick={() => handleDeleteElement(element.pk)}
                         className="mt-3 w-100"
                         size="lg"
                       >
@@ -259,7 +359,9 @@ const ConfigurationPage: FC = () => {
               )}
             </Col>
 
-            <Button variant="primary" onClick={handleSubmit}>Оформить заявку</Button>
+            <Button variant="primary" onClick={handleSubmit} className='m-2'>Оформить заявку</Button>
+            <Button variant="warning" onClick={() => handleEditConfiguration()} className='m-2'>Изменить заявку</Button>
+            <Button variant="danger" onClick={() => handleDeleteConfiguration(configuration.configuration.pk)} className='m-2'>Удалить заявку</Button>
           </>
         ) : (
           <p>Конфигурация не найдена.</p>

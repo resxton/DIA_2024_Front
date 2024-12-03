@@ -36,6 +36,7 @@ export interface PlaneConfigurationListResponse {
   }>;
 }
 
+
 export interface Configuration {
   /** ID */
   pk: number;
@@ -356,8 +357,8 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   configurationMap = {
     /**
-     * No description
-     *
+     * Обновить количество элемента в конфигурации
+     * 
      * @tags configuration_map
      * @name ConfigurationMapUpdate
      * @summary Обновить количество элемента в конфигурации
@@ -385,12 +386,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
           ...params,  // Добавляем другие параметры запроса
         },
       }),
-    
-    
-    
-
+  
     /**
-     * No description
+     * Удалить элемент из конфигурации по идентификаторам
      *
      * @tags configuration_map
      * @name ConfigurationMapDelete
@@ -399,21 +397,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     configurationMapDelete: (
-      data: {
-        configuration_id?: number;
-        element_id?: number;
-      },
+      configurationId: number,  // Параметр для конфигурации
+      elementId: number,  // Параметр для элемента
       params: RequestParams = {},
     ) =>
       this.request<void, void>({
-        path: `/configuration_map/`,
+        path: `/configuration_map/`,  // Путь без ID
         method: "DELETE",
-        body: data,
         secure: true,
-        type: ContentType.Json,
-        ...params,
+        query: {
+          configuration_id: configurationId,  // Параметр query для конфигурации
+          element_id: elementId,  // Параметр query для элемента
+          ...params,  // Добавляем другие параметры запроса
+        },
       }),
   };
+  
   login = {
     /**
      * Вход в систему.
@@ -526,7 +525,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request DELETE:/plane_configuration/{id}/
      * @secure
      */
-    planeConfigurationDelete: (id: string, params: RequestParams = {}) =>
+    planeConfigurationDelete: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/plane_configuration/${id}/`,
         method: "DELETE",
