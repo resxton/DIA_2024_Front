@@ -26,7 +26,7 @@ const ElementsPage: FC = () => {
   const [draftElementsCount, setDraftElementsCount] = useState(0);
   const [elements, setElements] = useState<ConfigurationElement[]>([]);
   const [category, setCategory] = useState('');
-  const [minPrice, setMinPrice] = useState(1);
+  const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100000000);
   const navigate = useNavigate();
 
