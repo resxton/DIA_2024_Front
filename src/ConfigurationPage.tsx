@@ -147,7 +147,7 @@ const ConfigurationPage: FC = () => {
               {configuration.configuration_elements.length > 0 ? (
                 <div>
                   {configuration.configuration_elements.map((element: ConfigurationElement) => (
-                    <Row className="mb-4 d-flex align-items-center">
+                    <Row key={element.pk} className="mb-4 d-flex align-items-center">
                       <Col xs={12} md={10}>
                         <ElementCard 
                           id={element.pk}
