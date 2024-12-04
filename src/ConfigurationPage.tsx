@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { Container, Button, Row, Col, Spinner, Card, Form, Modal } from 'react-bootstrap';
+import { Container, Button, Row, Col, Spinner, Card, Form } from 'react-bootstrap';
 import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
@@ -20,7 +20,6 @@ const ConfigurationPage: FC = () => {
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [configurationStatus, setConfigurationStatus] = useState<string>('');
-  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();  // Инициализируем navigate
 
@@ -73,9 +72,45 @@ const ConfigurationPage: FC = () => {
         setLoading(false);
       });
   }, [id]);
-  
-  
-  
+
+
+  // Функция для преобразования даты
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    // Форматирование числа, месяца словами и времени
+    const formatter = new Intl.DateTimeFormat("ru-RU", {
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // Приводим первый символ месяца к заглавной букве
+    const formattedDate = formatter.format(date).replace(/^[а-я]/, (c) => c.toUpperCase());
+
+    return formattedDate;
+  };
+
+  // Определение типов для статусов
+  type ServerStatus = 'draft' | 'deleted' | 'created' | 'completed' | 'rejected';
+  type HumanReadableStatus = 'Черновик' | 'Удалена' | 'Сформирована' | 'Завершена' | 'Отклонена';
+
+  // Объект сопоставления статусов
+  const statusMap: Record<ServerStatus, HumanReadableStatus> = {
+    draft: 'Черновик',
+    deleted: 'Удалена',
+    created: 'Сформирована',
+    completed: 'Завершена',
+    rejected: 'Отклонена',
+  };
+
+  // Функция для преобразования статуса
+  const getHumanReadableStatus = (serverStatus: ServerStatus): HumanReadableStatus | 'Неизвестный статус' => {
+    return statusMap[serverStatus] || 'Неизвестный статус';
+  };
+
+
   const handleUpdateQuantity = (elementId: number, action: 'increment' | 'decrement') => {
     if (!configuration || !Array.isArray(configuration.counts)) return;  // Проверка на наличие и корректность типа
   
@@ -225,28 +260,13 @@ const ConfigurationPage: FC = () => {
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Статус</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.status} disabled />
+                          <Form.Control type="text" value={getHumanReadableStatus(configuration.configuration.status)} disabled />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Дата создания</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.created_at} disabled />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-
-                    <Row>
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Дата оформления</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.updated_at || ""} disabled />
-                        </Form.Group>
-                      </Col>
-                      <Col md={6}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Дата завершения</Form.Label>
-                          <Form.Control type="text" value={configuration.configuration.completed_at || ""} disabled />
+                          <Form.Control type="text" value={formatDate(configuration.configuration.created_at || "")} disabled />
                         </Form.Group>
                       </Col>
                     </Row>
@@ -301,7 +321,20 @@ const ConfigurationPage: FC = () => {
                   {configuration.configuration_elements.map((element: ConfigurationElement, index: number) => (
                     <Row key={element.pk} className="mb-4 align-items-center">
                     {/* Карточка элемента */}
-                    <Col xs={12} md={7} className="mb-3">
+                    {configuration.configuration.status != 'draft' ? (
+                    <Col xs={12} md={10} className="mb-3">
+                      <ElementCard 
+                        id={element.pk}
+                        name={element.name}
+                        price={element.price}
+                        category={element.category}
+                        image={element.image}
+                        detail_text={element.detail_text}
+                        onAddToDraft={() => {}}
+                        showAddButton={false}
+                      />
+                    </Col> ) : (
+                      <Col xs={12} md={9} className="mb-3">
                       <ElementCard 
                         id={element.pk}
                         name={element.name}
@@ -313,10 +346,11 @@ const ConfigurationPage: FC = () => {
                         showAddButton={false}
                       />
                     </Col>
+                    )}
 
                     {/* Блок управления количеством */}
-                      {configuration.configuration.status === 'draft' && (
-                        <Col xs={12} md={4} className="d-flex flex-column align-items-start justify-content-center ps-md-5">
+                      {configuration.configuration.status === 'draft' ?  (
+                        <Col xs={12} md={3} className="d-flex flex-column align-items-start justify-content-center ps-md-5">
                           <div className="quantity-control d-flex align-items-center gap-3 p-3 border rounded shadow-sm bg-light w-100">
                             {/* Кнопка уменьшения количества */}
                             <Button 
@@ -354,12 +388,17 @@ const ConfigurationPage: FC = () => {
                             Удалить
                           </Button>
                         </Col>
-                      )}
-
-                  
-                    
-                  </Row>
-                                    
+                      ) : 
+                      <Col xs={12} md={2} className="d-flex flex-column align-items-center justify-content-center ps-md-5">
+                        <div className="d-flex align-items-center justify-content-center p-3 border rounded shadow-sm bg-light w-100">
+                          {/* Отображение количества */}
+                          <span className="badge text-black px-2 py-3 fs-5">
+                            {configuration.counts[index] || 0}
+                          </span>
+                        </div>
+                      </Col>
+                      }
+                  </Row>                                    
                   ))}
                 </div> 
               ) : (

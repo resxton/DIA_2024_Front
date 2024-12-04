@@ -67,7 +67,7 @@ const ElementsPage: FC = () => {
       .then(() => {
         dispatch(logout()); // Логаут пользователя
         dispatch(resetFilters()); // Сброс фильтров в Redux
-  
+        setDraftID(-1)
         setDraftElementsCount(0); // Сбрасываем количество элементов в корзине
   
         navigate('/configuration-elements'); // Перенаправление на нужную страницу
@@ -84,7 +84,7 @@ const ElementsPage: FC = () => {
   };
 
   const handleGoToDraft = () => {
-    if (draftID) {
+    if (draftID != -1) {
       navigate(`/configuration/${draftID}`);
     }
   };
@@ -125,7 +125,7 @@ const ElementsPage: FC = () => {
             style={{ cursor: isAuthenticated ? 'pointer' : 'normal' }}
           >
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
-            <Badge pill bg={isAuthenticated ? 'primary' : 'danger'} className="draft-count-badge">
+            <Badge pill bg={isAuthenticated ? 'primary' : 'secondary'} className="draft-count-badge">
               {isAuthenticated ? draftElementsCount : 0} 
             </Badge>
           </div>

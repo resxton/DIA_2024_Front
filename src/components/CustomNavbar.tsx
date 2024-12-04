@@ -34,7 +34,9 @@ const CustomNavbar: FC<CustomNavbarProps> = ({ isAuthenticated, user, onLogout }
       <Navbar.Collapse id="navbar-nav">
         <Nav className="ml-auto">
           <Nav.Link as={Link} to={ROUTES.ELEMENTS}>{ROUTE_LABELS.ELEMENTS}</Nav.Link>
+          {isAuthenticated ? (
           <Nav.Link as={Link} to={ROUTES.CONFIGURATIONS}>{ROUTE_LABELS.CONFIGURATIONS}</Nav.Link>
+          ) : ( <></>)}
           {!isAuthenticated ? (
             <>
               <Nav.Link as={Link} to={ROUTES.LOGIN}>Войти</Nav.Link>
