@@ -2,7 +2,7 @@ import "./ElementPage.css"; // создайте и подключите файл
 import { FC, useEffect, useState } from "react";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "./Routes";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Spinner, Image, Button } from "react-bootstrap";
 import defaultImage from "./assets/Default.jpeg";
 import { ELEMENTS_MOCK } from "./modules/mock";
@@ -14,6 +14,8 @@ import { RootState } from "./redux/store"; // импортируйте RootState
 export const ElementPage: FC = () => {
   const [pageData, setPageData] = useState<ConfigurationElement>();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();  // Инициализируем navigate
 
   const { id } = useParams(); // Получаем ID страницы
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth); // Получаем данные аутентификации из Redux
@@ -30,8 +32,15 @@ export const ElementPage: FC = () => {
         const elementData = response.data as ConfigurationElement;
         setPageData(elementData);
       })
-      .catch(() => {
+      .catch((error) => {
         console.error("Ошибка при загрузке данных, используется мок.");
+        if (error.response && error.response.status === 403) {
+          setError('403');
+        } else if (error.response && error.response.status === 404) {
+          setError('404');
+        } else {
+          setError('not_found');
+        }
         const mockElement = ELEMENTS_MOCK.configuration_elements.find(
           (element) => element.pk === Number(id)
         );
@@ -43,6 +52,14 @@ export const ElementPage: FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+  if (error === '403') {
+    navigate('/403')
+  }
+
+  if (error === '404') {
+    navigate('/404')
+  }
 
   const handleAddToConfiguration = () => {
     if (isAuthenticated) {

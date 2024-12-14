@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Button, Row, Col, Spinner, Card, Form } from 'react-bootstrap';
 import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
@@ -7,9 +7,7 @@ import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from './redux/store';
-import { logout, logoutAsync } from './redux/authSlice';
 import CustomNavbar from './components/CustomNavbar';
-import ElementCard from './components/ElementCard';  // Import ElementCard component
 import './ConfigurationPage.css';
 import CartElementCard from './components/CartElementCard';
 
@@ -23,7 +21,7 @@ const ConfigurationPage: FC = () => {
   const [configurationStatus, setConfigurationStatus] = useState<string>('');
   const dispatch: AppDispatch = useDispatch(); // Типизируем dispatch
   const navigate = useNavigate();  // Инициализируем navigate
-
+  const [error, setError] = useState('');
 
   // Access authentication state from Redux store
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -38,6 +36,13 @@ const ConfigurationPage: FC = () => {
         setConfiguration(data);
       })
       .catch((error) => {
+        if (error.response && error.response.status === 403) {
+          setError('403');
+        } else if (error.response && error.response.status === 404) {
+          setError('404');
+        } else {
+          setError('not_found');
+        }
         console.error('Ошибка при загрузке конфигурации:', error);
       })
       .finally(() => {
@@ -73,6 +78,14 @@ const ConfigurationPage: FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+  if (error === '403') {
+    navigate('/403')
+  }
+
+  if (error === '404') {
+    navigate('/404')
+  }
 
 
   // Функция для преобразования даты

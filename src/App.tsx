@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ElementPage } from "./ElementPage";
 import ElementsPage from "./ElementsPage";
+import ForbiddenPage from "./403Page";
+import NotFoundPage from "./404Page";
 import { ROUTES } from "./Routes";
 import { HomePage } from "./HomePage";
 import LoginPage from './LoginPage';
@@ -25,7 +27,13 @@ function App() {
         <Route path={ROUTES.CONFIGURATIONS} element={<ConfigurationsPage />} />
         <Route path={ROUTES.ELEMENTS_TABLE} element={<ConfigurationElementsTable />} />
         <Route path={`${ROUTES.ELEMENTS_TABLE}/:id`} element={<EditConfigurationElement />} />
-
+        
+        {/* Страницы ошибок */}
+        <Route path="/403" element={<ForbiddenPage />} />
+        <Route path="/404" element={<NotFoundPage />} />
+        
+        {/* Страница по умолчанию для несуществующих маршрутов */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
