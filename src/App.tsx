@@ -8,6 +8,8 @@ import RegisterPage from './RegisterPage';
 import UserDashboardPage from './ProfilePage';
 import ConfigurationPage from "./ConfigurationPage";
 import ConfigurationsPage from "./ConfigurationsPage";
+import ConfigurationElementsTable from "./ConfigurationElementsTable";
+import EditConfigurationElement from "./EditConfigurationElement";
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
         <Route path={ROUTES.USER_DASHBOARD} element={<UserDashboardPage />} />
         <Route path={`${ROUTES.CONFIGURATION}/:id`} element={<ConfigurationPage />} />
         <Route path={ROUTES.CONFIGURATIONS} element={<ConfigurationsPage />} />
+        <Route path={ROUTES.ELEMENTS_TABLE} element={<ConfigurationElementsTable />} />
+        <Route path={`${ROUTES.ELEMENTS_TABLE}/:id`} element={<EditConfigurationElement />} />
+
       </Routes>
     </BrowserRouter>
   );

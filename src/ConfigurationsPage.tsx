@@ -1,12 +1,11 @@
 import { FC, useState, useEffect } from 'react';
-import { Container, Button, Row, Col, Table, Spinner } from 'react-bootstrap';
+import { Container, Button, Table, Spinner } from 'react-bootstrap';
 import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationListResponse } from './api/Api';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './redux/store';
-import { logout } from './redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 import CustomNavbar from './components/CustomNavbar';
 
@@ -46,8 +45,7 @@ const ConfigurationsPage: FC = () => {
     <div className="configurations-page">
       <CustomNavbar 
         isAuthenticated={isAuthenticated} 
-        user={user} 
-        onLogout={() => dispatch(logout())}
+        user={user}
       />
 
       <BreadCrumbs

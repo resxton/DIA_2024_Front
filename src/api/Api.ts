@@ -9,6 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+export interface LoginResponse {
+  message: string;
+  is_staff: boolean;
+}
+
 export interface ConfigurationMap {
   /** Id */
   id?: number;
@@ -430,7 +435,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<void, void>({
+      this.request<LoginResponse, void>({
         path: `/login/`,
         method: "POST",
         body: data,

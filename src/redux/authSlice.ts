@@ -4,7 +4,12 @@ import { api } from '../api';
 // Интерфейс состояния аутентификации
 interface AuthState {
   isAuthenticated: boolean;
-  user: { username: string | null; token: string | null; id: number | null };
+  user: { 
+    id: number | null; // Добавляем id
+    username: string | null; 
+    token: string | null; 
+    is_staff: boolean | null; 
+  };
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -14,7 +19,7 @@ const loadAuthFromLocalStorage = () => {
   const savedAuth = localStorage.getItem('auth');
   return savedAuth
     ? JSON.parse(savedAuth)
-    : { isAuthenticated: false, user: { username: null, token: null, id: null }, loading: 'idle', error: null };
+    : { isAuthenticated: false, user: { id: null, username: null, token: null, is_staff: null }, loading: 'idle', error: null };
 };
 
 // Функция для сохранения состояния аутентификации в localStorage
@@ -30,20 +35,28 @@ export const loginAsync = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      console.log(`Logging in with username: ${username}, password: ${password}`); // Логируем перед запросом
-
-      // Отправляем данные для аутентификации
-      const response = await api.login.loginCreate({ username, password });
+      console.log(`Logging in with username: ${username}, password: ${password}`);
 
       // Получаем ID пользователя по имени
       const userResponse = await api.user.userGetIdByUsername(username);
       const id = userResponse.data.id;
 
-      console.log(`Login successful for username: ${username}`); // Логируем после успешного логина
+      // Логин пользователя
+      const response = await api.login.loginCreate({ username, password });
 
-      return { username, token: 'no-token', id }; // Здесь подставьте реальный токен, если он используется
+      if (response?.data.is_staff !== undefined) {
+        const isStaff = response.data.is_staff;
+        
+        console.log(`Login successful for username: ${username}`);
+        
+        return { id, username, token: 'no-token', is_staff: isStaff }; // Возвращаем id, username и is_staff
+      } else {
+        console.error("Ответ не содержит поля is_staff");
+        return rejectWithValue('Ошибка: отсутствует поле is_staff');
+      }
+
     } catch (error: any) {
-      console.error(`Login failed for username: ${username}, error: ${error.message || 'Unknown error'}`); // Логируем в случае ошибки
+      console.error(`Login failed for username: ${username}, error: ${error.message || 'Unknown error'}`);
       return rejectWithValue(error.message || 'Ошибка при входе в систему');
     }
   }
@@ -55,20 +68,19 @@ export const logoutAsync = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const { username } = state.auth.user; // Получаем имя пользователя перед логаутом
+      const { username } = state.auth.user;
 
-      console.log(`Logging out user: ${username}`); // Логируем перед логаутом
+      console.log(`Logging out user: ${username}`);
 
       await api.logout.logoutCreate();
 
-      console.log(`Logout successful for username: ${username}`); // Логируем после успешного логаута
+      console.log(`Logout successful for username: ${username}`);
     } catch (error: any) {
-      console.error(`Logout failed, error: ${error.message || 'Unknown error'}`); // Логируем в случае ошибки
+      console.error(`Logout failed, error: ${error.message || 'Unknown error'}`);
       return rejectWithValue(error.message || 'Ошибка при выходе из системы');
     }
   }
 );
-
 
 // Начальное состояние, загружаем из localStorage
 const initialState: AuthState = loadAuthFromLocalStorage();
@@ -79,7 +91,7 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.isAuthenticated = false;
-      state.user = { username: null, token: null, id: null };
+      state.user = { id: null, username: null, token: null, is_staff: null }; // Сбрасываем id
       state.error = null;
       saveAuthToLocalStorage(state); // Сохраняем в localStorage
     },
@@ -91,11 +103,11 @@ const authSlice = createSlice({
         state.loading = 'pending';
         state.error = null;
       })
-      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<{ username: string; token: string; id: number }>) => {
+      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<{ id: number; username: string; token: string; is_staff: boolean }>) => {
         state.isAuthenticated = true;
         state.user = action.payload;
         state.loading = 'succeeded';
-        saveAuthToLocalStorage(state);
+        saveAuthToLocalStorage(state); // Сохраняем в localStorage
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = 'failed';
@@ -109,10 +121,10 @@ const authSlice = createSlice({
       })
       .addCase(logoutAsync.fulfilled, (state) => {
         state.isAuthenticated = false;
-        state.user = { username: null, token: null, id: null };
+        state.user = { id: null, username: null, token: null, is_staff: null }; // Сбрасываем id
         state.loading = 'succeeded';
         state.error = null;
-        saveAuthToLocalStorage(state);
+        saveAuthToLocalStorage(state); // Сохраняем в localStorage
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.loading = 'failed';
