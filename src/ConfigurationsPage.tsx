@@ -23,7 +23,7 @@ const ConfigurationsPage: FC = () => {
   };
 
   // Fetch the list of configurations when the page loads
-  useEffect(() => {
+  const fetchConfigurations = () => {
     api.planeConfigurations
       .planeConfigurationList()
       .then((response) => {
@@ -35,6 +35,17 @@ const ConfigurationsPage: FC = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchConfigurations(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchConfigurations(); // Fetch every 2 seconds
+    }, 2000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
