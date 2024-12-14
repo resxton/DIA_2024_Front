@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
@@ -19,29 +19,6 @@ const ProfilePage: FC = () => {
   // Получаем userId из Redux
   const { user } = useSelector((state: RootState) => state.auth);
   const userId = user?.id; // Получаем ID пользователя из стора, предполагая, что оно хранится там
-
-  // Загрузка данных профиля при монтировании компонента
-  useEffect(() => {
-    if (!userId) {
-      setError('Не удалось получить ID пользователя');
-      return;
-    }
-
-    const fetchProfileData = async () => {
-      try {
-        const profileData = (await api.user.userRead(userId)).data; // Используем метод userRead для получения данных пользователя
-
-        setUsername(profileData.username || ''); // Если значение username не задано, используем пустую строку
-        setFirstName(profileData.first_name || ''); // Если значение first_name не задано, используем пустую строку
-        setLastName(profileData.last_name || ''); // Если значение last_name не задано, используем пустую строку
-        setEmail(profileData.email || ''); // Если значение email не задано, используем пустую строку
-      } catch (err) {
-        setError('Ошибка при загрузке данных');
-      }
-    };
-
-    fetchProfileData();
-  }, [userId]);
 
   const handleProfileUpdate = async () => {
     if (!user || !user.token) {

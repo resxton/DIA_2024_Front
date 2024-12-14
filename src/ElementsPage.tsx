@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from 'react';
 import { Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from './redux/authSlice'; // Импортируем действия
 import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
 import planeIcon from './assets/plane.svg';
@@ -12,7 +11,6 @@ import { api } from './api';
 import { ConfigurationElementsResult, ConfigurationElement } from './api/Api';
 import { ElementCard } from './components/ElementCard';
 import './ElementsPage.css';
-import { resetFilters } from './redux/filterSlice';
 import CustomNavbar from './components/CustomNavbar';
 
 const ElementsPage: FC = () => {
@@ -22,7 +20,7 @@ const ElementsPage: FC = () => {
   const [minPrice, setMinPrice] = useState(1);
   const [maxPrice, setMaxPrice] = useState(100000000);
   const [loading, setLoading] = useState(true);
-  const [draftID, setDraftID] = useState(0);
+  const [draftID, setDraftID] = useState(-1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -43,7 +41,7 @@ const ElementsPage: FC = () => {
           setElements([]);
         }
         setDraftElementsCount(data.draft_elements_count || 0);
-        setDraftID(data.draft_configuration_id || 0);
+        setDraftID(data.draft_configuration_id || -1);
       })
       .catch((error) => {
         console.error('Ошибка при загрузке данных:', error);
@@ -61,21 +59,6 @@ const ElementsPage: FC = () => {
     setMaxPrice(maxPrice);
   };
 
-  const handleLogout = () => {
-    api.logout
-      .logoutCreate()
-      .then(() => {
-        dispatch(logout()); // Логаут пользователя
-        dispatch(resetFilters()); // Сброс фильтров в Redux
-        setDraftID(-1)
-        setDraftElementsCount(0); // Сбрасываем количество элементов в корзине
-  
-        navigate('/configuration-elements'); // Перенаправление на нужную страницу
-      })
-      .catch((error) => {
-        console.error('Ошибка при выходе из системы:', error);
-      });
-  };
   
   // Функция для обновления количества элементов в корзине
   const handleAddToDraft = () => {
@@ -100,7 +83,6 @@ const ElementsPage: FC = () => {
       <CustomNavbar
         isAuthenticated={isAuthenticated}
         user={user}
-        onLogout={handleLogout}
       />
 
       <BreadCrumbs

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { logoutAsync } from './authSlice'; // Импорт logoutAsync из authSlice
 
 interface FilterState {
   category: string;
@@ -8,10 +9,10 @@ interface FilterState {
 
 const loadFiltersFromLocalStorage = () => {
   const savedFilters = localStorage.getItem('filters');
-  return savedFilters ? JSON.parse(savedFilters) : {};
+  return savedFilters ? JSON.parse(savedFilters) : { category: '', minPrice: 1, maxPrice: 100000000 };
 };
 
-const saveFiltersToLocalStorage = (filters: { category: string, minPrice: number, maxPrice: number }) => {
+const saveFiltersToLocalStorage = (filters: { category: string; minPrice: number; maxPrice: number }) => {
   localStorage.setItem('filters', JSON.stringify(filters));
 };
 
@@ -38,8 +39,16 @@ const filterSlice = createSlice({
       state.minPrice = 1;
       state.maxPrice = 100000000;
       saveFiltersToLocalStorage(state);
-    }
-  }
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logoutAsync.fulfilled, (state) => {
+      state.category = '';
+      state.minPrice = 1;
+      state.maxPrice = 100000000;
+      saveFiltersToLocalStorage(state); // Сохранение сброшенного состояния в localStorage
+    });
+  },
 });
 
 export const { setCategory, setMinPrice, setMaxPrice, resetFilters } = filterSlice.actions;

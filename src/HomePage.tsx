@@ -1,16 +1,23 @@
 import { FC } from "react";
-import { Link } from "react-router-dom";
-import { ROUTES } from "./Routes";
-import { Button, Container, Carousel, Image } from "react-bootstrap";
+import { Container, Carousel, Image, Row } from "react-bootstrap";
 import carousel1 from "./assets/Carousel1.jpg"
 import carousel2 from "./assets/Carousel2.jpg"
 import carousel3 from "./assets/Carousel3.jpg"
 import './HomePage.css'
+import { useSelector } from "react-redux";
+import CustomNavbar from "./components/CustomNavbar";
 
 
 export const HomePage: FC = () => {
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+
   return (
     <Container className="d-flex flex-column align-items-center">
+      <Row className="w-100">
+       <CustomNavbar
+          isAuthenticated={isAuthenticated}
+          user={user}
+        />
       <h1>Заказ на постройку самолета</h1>
       <p>
         Добро пожаловать в систему конфигурации самолета! Здесь вы можете выбрать различные элементы для воздушного судна вашей мечты.
@@ -50,9 +57,10 @@ export const HomePage: FC = () => {
               </Carousel.Caption>
             </Carousel.Item>
           </Carousel>
-      <Link to={ROUTES.ELEMENTS}>
+      {/* <Link to={ROUTES.ELEMENTS}>
         <Button variant="primary">Просмотреть элементы конфигурации</Button>
-      </Link>
+      </Link> */}
+      </Row>
     </Container>
   );
 };

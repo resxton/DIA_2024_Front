@@ -6,11 +6,12 @@ import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from './redux/store';
-import { logout } from './redux/authSlice';
+import { AppDispatch, RootState } from './redux/store';
+import { logout, logoutAsync } from './redux/authSlice';
 import CustomNavbar from './components/CustomNavbar';
 import ElementCard from './components/ElementCard';  // Import ElementCard component
 import './ConfigurationPage.css';
+import CartElementCard from './components/CartElementCard';
 
 const ConfigurationPage: FC = () => {
   const { id } = useParams(); // Get configuration ID from the URL
@@ -20,7 +21,7 @@ const ConfigurationPage: FC = () => {
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [configurationStatus, setConfigurationStatus] = useState<string>('');
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch(); // Типизируем dispatch
   const navigate = useNavigate();  // Инициализируем navigate
 
 
@@ -236,7 +237,6 @@ const ConfigurationPage: FC = () => {
       <CustomNavbar 
         isAuthenticated={isAuthenticated} 
         user={user} 
-        onLogout={() => dispatch(logout())}
       />
 
       <BreadCrumbs
@@ -321,32 +321,28 @@ const ConfigurationPage: FC = () => {
                   {configuration.configuration_elements.map((element: ConfigurationElement, index: number) => (
                     <Row key={element.pk} className="mb-4 align-items-center">
                     {/* Карточка элемента */}
-                    {configuration.configuration.status != 'draft' ? (
-                    <Col xs={12} md={10} className="mb-3">
-                      <ElementCard 
-                        id={element.pk}
-                        name={element.name}
-                        price={element.price}
-                        category={element.category}
-                        image={element.image}
-                        detail_text={element.detail_text}
-                        onAddToDraft={() => {}}
-                        showAddButton={false}
-                      />
-                    </Col> ) : (
+                    {configuration.configuration.status !== 'draft' ? (
+                      <Col xs={12} md={10} className="mb-3">
+                        <CartElementCard 
+                          id={element.pk}
+                          name={element.name}
+                          price={element.price}
+                          category={element.category}
+                          image={element.image}
+                        />
+                      </Col>
+                    ) : (
                       <Col xs={12} md={9} className="mb-3">
-                      <ElementCard 
-                        id={element.pk}
-                        name={element.name}
-                        price={element.price}
-                        category={element.category}
-                        image={element.image}
-                        detail_text={element.detail_text}
-                        onAddToDraft={() => {}}
-                        showAddButton={false}
-                      />
-                    </Col>
+                        <CartElementCard 
+                          id={element.pk}
+                          name={element.name}
+                          price={element.price}
+                          category={element.category}
+                          image={element.image}
+                        />
+                      </Col>
                     )}
+
 
                     {/* Блок управления количеством */}
                       {configuration.configuration.status === 'draft' ?  (

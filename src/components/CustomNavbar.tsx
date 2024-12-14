@@ -3,19 +3,23 @@ import { Navbar, Nav } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES, ROUTE_LABELS } from '../Routes';
 import logo from '../assets/logo.svg';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../redux/store'; // Импортируем AppDispatch
+import { logoutAsync } from '../redux/authSlice';
 
 interface CustomNavbarProps {
   isAuthenticated: boolean;
   user: any;
-  onLogout: () => void;
 }
 
-const CustomNavbar: FC<CustomNavbarProps> = ({ isAuthenticated, user, onLogout }) => {
+const CustomNavbar: FC<CustomNavbarProps> = ({ isAuthenticated, user }) => {
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch(); // Типизируем dispatch
 
   const handleLogoClick = () => navigate('/');
+
   const handleLogoutClick = () => {
-    onLogout();
+    dispatch(logoutAsync()); // Теперь ошибки быть не должно
   };
 
   return (
@@ -35,8 +39,8 @@ const CustomNavbar: FC<CustomNavbarProps> = ({ isAuthenticated, user, onLogout }
         <Nav className="ml-auto">
           <Nav.Link as={Link} to={ROUTES.ELEMENTS}>{ROUTE_LABELS.ELEMENTS}</Nav.Link>
           {isAuthenticated ? (
-          <Nav.Link as={Link} to={ROUTES.CONFIGURATIONS}>{ROUTE_LABELS.CONFIGURATIONS}</Nav.Link>
-          ) : ( <></>)}
+            <Nav.Link as={Link} to={ROUTES.CONFIGURATIONS}>{ROUTE_LABELS.CONFIGURATIONS}</Nav.Link>
+          ) : null}
           {!isAuthenticated ? (
             <>
               <Nav.Link as={Link} to={ROUTES.LOGIN}>Войти</Nav.Link>
