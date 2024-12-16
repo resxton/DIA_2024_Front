@@ -493,7 +493,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @request GET:/plane_configuration/{id}/
    * @secure
    */
-  planeConfigurationRead: (id: string, params: RequestParams = {}) =>
+  planeConfigurationRead: (id: number, params: RequestParams = {}) =>
     this.request<PlaneConfigurationResponse, any>({
       path: `/plane_configuration/${id}/`,
       method: "GET",
@@ -547,11 +547,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/plane_configuration/{id}/accept-reject/
      * @secure
      */
-    planeConfigurationAcceptRejectUpdate: (id: string, data: Configuration, params: RequestParams = {}) =>
+    planeConfigurationAcceptRejectUpdate: (
+      id: number,
+      data: { status: 'completed' | 'rejected' }, // Указываем тип для поля status
+      params: RequestParams = {}
+    ) =>
       this.request<Configuration, any>({
         path: `/plane_configuration/${id}/accept-reject/`,
         method: "PUT",
-        body: data,
+        body: data, // Передаем объект с полем status
         secure: true,
         format: "json",
         ...params,

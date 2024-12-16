@@ -22,7 +22,7 @@ export const ROUTES = {
 	USER_DASHBOARD: "Личный кабинет", // Подпись для личного кабинета
 	USER_APPLICATIONS: "Мои заявки", // Подпись для страницы с заявками пользователя
 	CONFIGURATION: "Текущая конфигурация",
-	CONFIGURATIONS: "Ваши конфигурации",
+	CONFIGURATIONS: "Конфигурации",
 	ELEMENTS_TABLE: "Элементы конфигурации",
 	EDIT_ELEMENT: "Редактирование элемента"
   };

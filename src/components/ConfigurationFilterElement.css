@@ -1,0 +1,72 @@
+/* Основной контейнер фильтра */
+.filter-container {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 20px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+  }
+  
+  /* Общий стиль строк */
+  .filter-row {
+	margin-bottom: 15px;
+	align-items: center;
+  }
+  
+  /* Лейблы */
+  .filter-row label {
+	font-size: 1rem;
+	font-weight: bold;
+  }
+  
+  /* Поля ввода */
+  .filter-row input {
+	padding: 8px 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 1rem;
+  }
+  
+  /* Кнопка фильтрации */
+  .filter-btn {
+	display: block;
+	width: 100%;
+	padding: 10px;
+	font-size: 16px;
+	font-weight: bold;
+	color: white;
+	background-color: #007bff;
+	border: none;
+	border-radius: 4px;
+	transition: background-color 0.3s ease;
+  }
+  
+  .filter-btn:hover {
+	background-color: #0056b3;
+  }
+  
+  .filter-btn:active {
+	background-color: #003f8f;
+  }
+  
+  /* Для мобильных устройств */
+  @media (max-width: 768px) {
+	.filter-container {
+	  padding: 15px;
+	}
+  
+	.filter-row {
+	  flex-direction: column;
+	  align-items: flex-start;
+	}
+  
+	.filter-row label {
+	  margin-bottom: 5px;
+	}
+  
+	.filter-row input {
+	  width: 100%;
+	}
+  }
+  

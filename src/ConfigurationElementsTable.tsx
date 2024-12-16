@@ -13,8 +13,7 @@ const ConfigurationElementsTable = () => {
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
   const navigate = useNavigate();
 
-
-  useEffect(() => {
+  const fetchData = () => {
     // Получаем данные с API
     api.planeConfigurationElements
       .planeConfigurationElementsList()
@@ -28,6 +27,17 @@ const ConfigurationElementsTable = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+      fetchData()
+
+      const interval = setInterval(() => {
+        fetchData(); // Fetch every 2 seconds
+      }, 2000);
+  
+      // Clear interval on component unmount
+      return () => clearInterval(interval);
   }, []);
 
   // Редирект при изменении isAuthenticated

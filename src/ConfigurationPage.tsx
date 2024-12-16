@@ -30,7 +30,7 @@ const ConfigurationPage: FC = () => {
     if (!id) return;
   
     api.planeConfiguration
-      .planeConfigurationRead(id)
+      .planeConfigurationRead(Number(id))
       .then((response) => {
         const data = response.data as PlaneConfigurationResponse;
         setConfiguration(data);
@@ -55,7 +55,7 @@ const ConfigurationPage: FC = () => {
     if (!id) return;
   
     api.planeConfiguration
-      .planeConfigurationRead(id)
+      .planeConfigurationRead(Number(id))
       .then((response) => {
         const data = response.data as PlaneConfigurationResponse;
         console.log('Полученные данные:', data);
