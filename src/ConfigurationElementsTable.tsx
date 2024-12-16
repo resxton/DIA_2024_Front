@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, Button, Container } from 'react-bootstrap';
 import { api } from './api';
 import { ConfigurationElement } from './api/Api';
@@ -30,8 +30,32 @@ const ConfigurationElementsTable = () => {
       });
   }, []);
 
+  // Редирект при изменении isAuthenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.ELEMENTS); // Предполагается, что "/" — это ROUTES.HOME
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleEditClick = (id: number) => {
     navigate(`${ROUTES.ELEMENTS_TABLE}/${id}`);
+  };
+
+  const handleDeleteClick = (id: number) => {
+    const confirmDelete = window.confirm(
+      'Вы уверены, что хотите удалить этот элемент? Данное действие нельзя отменить.'
+    );
+    if (confirmDelete) {
+      api.planeConfigurationElement.planeConfigurationElementDelete(id.toString())
+        .then(() => {
+          alert('Элемент успешно удален.');
+          navigate(ROUTES.ELEMENTS_TABLE)
+        })
+        .catch((error) => {
+          console.error('Ошибка при удалении элемента:', error);
+          alert('Ошибка при удалении элемента. Попробуйте еще раз.');
+        });
+    }
   };
 
   if (loading) {
@@ -59,14 +83,18 @@ const ConfigurationElementsTable = () => {
               {elements.map((element) => (
                 <tr key={element.pk}>
                   <td>{element.name}</td>
-                  <td>{element.price}</td>
+                  <td>$ {element.price}</td>
                   <td>{element.category}</td>
                   <td>{element.key_info}</td>
                   <td style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Button variant="outline-primary" onClick={() => handleEditClick(element.pk)}>
                       Редактировать
                     </Button>
-                    <Button variant="danger" disabled style={{ flexGrow: 1, marginLeft: '5px' }}>
+                    <Button
+                      variant="danger"
+                      style={{ flexGrow: 1, marginLeft: '5px' }}
+                      onClick={() => handleDeleteClick(element.pk)}
+                    >
                       Удалить
                     </Button>
                   </td>

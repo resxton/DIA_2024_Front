@@ -4,7 +4,7 @@ import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationListResponse } from './api/Api';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import { useNavigate } from 'react-router-dom';
 import CustomNavbar from './components/CustomNavbar';
@@ -12,7 +12,6 @@ import CustomNavbar from './components/CustomNavbar';
 const ConfigurationsPage: FC = () => {
   const [configurations, setConfigurations] = useState<PlaneConfigurationListResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // Access authentication state from Redux store

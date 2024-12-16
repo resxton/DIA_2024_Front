@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Container, Badge, Row, Col, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { FilterComponent } from './components/FilterComponent';
 import { ELEMENTS_MOCK } from './modules/mock';
 import planeIcon from './assets/plane.svg';
@@ -22,7 +22,6 @@ const ElementsPage: FC = () => {
   const [loading, setLoading] = useState(true);
   const [draftID, setDraftID] = useState(-1);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 

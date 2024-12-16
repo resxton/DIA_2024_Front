@@ -254,7 +254,7 @@ const ConfigurationPage: FC = () => {
 
       <BreadCrumbs
         crumbs={[
-          { label: ROUTE_LABELS.ELEMENTS, path: ROUTES.ELEMENTS },
+          { label: ROUTE_LABELS.CONFIGURATIONS, path: ROUTES.CONFIGURATIONS },
           { label: `Конфигурация #${id}`, path: `/configuration/${id}` },
         ]}
       />
@@ -268,7 +268,8 @@ const ConfigurationPage: FC = () => {
               <Card className="mb-4">
                 <Card.Body>
                   <Card.Title>Данные конфигурации</Card.Title>
-                  <Form>
+                  {configuration.configuration.status === 'draft' ?  (
+                    <Form>
                     <Row>
                       <Col md={6}>
                         <Form.Group className="mb-3">
@@ -321,11 +322,74 @@ const ConfigurationPage: FC = () => {
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Итоговая стоимость</Form.Label>
+                          <Form.Control type="text" value="Будет рассчитано позже" disabled />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    </Form>
+                  ) : (
+                    <Form>
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Статус</Form.Label>
+                          <Form.Control type="text" value={getHumanReadableStatus(configuration.configuration.status)} disabled />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Дата создания</Form.Label>
+                          <Form.Control type="text" value={formatDate(configuration.configuration.created_at || "")} disabled />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Покупатель</Form.Label>
+                          <Form.Control 
+                            type="text" 
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Номер телефона</Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Email</Form.Label>
+                          <Form.Control
+                            type="email"
+                            value={customerEmail}
+                            onChange={(e) => setCustomerEmail(e.target.value)}
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Итоговая стоимость</Form.Label>
                           <Form.Control type="text" value={`$ ${configuration.configuration.total_price}`} disabled />
                         </Form.Group>
                       </Col>
                     </Row>
-                  </Form>
+                    </Form>
+                  )}
                 </Card.Body>
               </Card>
 

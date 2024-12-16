@@ -3,13 +3,14 @@ import { FC, useEffect, useState } from "react";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "./Routes";
 import { useNavigate, useParams } from "react-router-dom";
-import { Spinner, Image, Button } from "react-bootstrap";
+import { Spinner, Image } from "react-bootstrap";
 import defaultImage from "./assets/Default.jpeg";
 import { ELEMENTS_MOCK } from "./modules/mock";
 import { api } from "./api";
 import { ConfigurationElement } from "./api/Api";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "./redux/store"; // импортируйте RootState вашего Redux хранилища
+import CustomNavbar from "./components/CustomNavbar";
 
 export const ElementPage: FC = () => {
   const [pageData, setPageData] = useState<ConfigurationElement>();
@@ -19,8 +20,6 @@ export const ElementPage: FC = () => {
 
   const { id } = useParams(); // Получаем ID страницы
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth); // Получаем данные аутентификации из Redux
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!id) return;
@@ -61,17 +60,9 @@ export const ElementPage: FC = () => {
     navigate('/404')
   }
 
-  const handleAddToConfiguration = () => {
-    if (isAuthenticated) {
-      console.log("Элемент добавлен в конфигурацию");
-      // Логика добавления элемента в конфигурацию
-    } else {
-      console.log("Пользователь не авторизован");
-    }
-  };
-
   return (
     <div className="element-page-container">
+      <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
       {loading && (
         <div className="loading-overlay">
           <Spinner animation="border" />

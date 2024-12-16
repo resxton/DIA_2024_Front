@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Container, Alert, Row, Col, Image } from 'react-bootstrap';
+import { Button, Form, Container, Alert, Row, Col, Image, Dropdown } from 'react-bootstrap';
 import { ConfigurationElement } from './api/Api';
 import { api } from './api';
-import { ROUTES } from './Routes';
+import { ROUTES, ROUTE_LABELS } from './Routes';
+import CustomNavbar from './components/CustomNavbar';
+import { RootState } from './redux/store';
+import { useSelector } from 'react-redux';
+import { BreadCrumbs } from './components/BreadCrumbs';
 
 const EditConfigurationElementPage = () => {
   const { id } = useParams();
@@ -12,8 +16,17 @@ const EditConfigurationElementPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null); // для хранения файла изображения
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+
+  const categories = [
+    'Компоновка салона',
+    'Дизайн салона',
+    'Авионика',
+    'Двигатель',
+    'Кресло',
+  ];
 
   useEffect(() => {
     if (!id) {
@@ -26,7 +39,7 @@ const EditConfigurationElementPage = () => {
         const elementData = response.data;
         setElement(elementData);
         setFormData(elementData);
-        setImagePreview(elementData.image || null); // Инициализируем изображение для предпросмотра
+        setImagePreview(elementData.image || null);
       })
       .catch(() => {
         setError('Ошибка при загрузке данных.');
@@ -44,30 +57,36 @@ const EditConfigurationElementPage = () => {
     });
   };
 
+  const handleCategorySelect = (category: string) => {
+    setFormData({
+      ...formData!,
+      category,
+    });
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string); // Устанавливаем изображение для предпросмотра
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      setImageFile(file); // Сохраняем сам файл
+      setImageFile(file);
     }
   };
 
   const handleSubmit = async () => {
     if (formData && element) {
       setLoading(true);
-  
+
       try {
-        // Обновляем данные конфигурационного элемента без картинки
         await api.planeConfigurationElement
           .planeConfigurationElementEditUpdate(id || '', {
-            ...formData, // отправляем только данные без картинки
+            ...formData,
           })
           .then(() => {
-            navigate(ROUTES.ELEMENTS); // Навигация на страницу элементов после сохранения
+            navigate(ROUTES.ELEMENTS);
           })
           .catch((error) => {
             setError("Ошибка при сохранении изменений");
@@ -81,17 +100,16 @@ const EditConfigurationElementPage = () => {
       }
     }
   };
-  
+
   const handleImageUpdate = async () => {
     if (imageFile && id) {
       setLoading(true);
-  
+
       try {
-        // Отправляем изображение отдельно
         await api.planeConfigurationElement
           .planeConfigurationElementEditCreate(id, { pic: imageFile })
           .then(() => {
-            navigate(ROUTES.ELEMENTS); // Навигация на страницу элементов после обновления изображения
+            navigate(ROUTES.ELEMENTS);
           })
           .catch((error) => {
             setError("Ошибка при обновлении изображения");
@@ -104,8 +122,33 @@ const EditConfigurationElementPage = () => {
         setLoading(false);
       }
     }
-  };  
-  
+  };
+
+  const handleCreateNew = async () => {
+    if (formData) {
+      setLoading(true);
+
+      try {
+        await api.planeConfigurationElements
+          .planeConfigurationElementsCreate({
+            ...formData,
+          })
+          .then(() => {
+            alert('Новый элемент успешно создан!');
+            navigate(ROUTES.ELEMENTS);
+          })
+          .catch((error) => {
+            setError('Ошибка при создании нового элемента');
+            console.error(error);
+          });
+      } catch (error) {
+        setError('Ошибка при создании нового элемента');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   if (loading) {
     return <div>Загрузка...</div>;
@@ -121,7 +164,14 @@ const EditConfigurationElementPage = () => {
 
   return (
     <Container className="mt-4">
-      <h2>Редактировать услугу</h2>
+      <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
+      <BreadCrumbs
+        crumbs={[
+          { label: ROUTE_LABELS.ELEMENTS_TABLE, path: ROUTES.ELEMENTS_TABLE },
+          { label: ROUTE_LABELS.EDIT_ELEMENT, path: ROUTES.EDIT_ELEMENT },
+        ]}
+      />
+      <h2 className="mt-4">Редактировать элемент конфигурации</h2>
       <Form className="mt-3">
         <Row>
           <Col md={6}>
@@ -166,13 +216,21 @@ const EditConfigurationElementPage = () => {
           <Col md={6}>
             <Form.Group controlId="category">
               <Form.Label>Категория</Form.Label>
-              <Form.Control
-                type="text"
-                name="category"
-                value={formData?.category || ''}
-                onChange={handleInputChange}
-                placeholder="Введите категорию"
-              />
+              <Dropdown>
+                <Dropdown.Toggle variant="outline-secondary">
+                  {formData?.category || 'Выберите категорию'}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {categories.map((category) => (
+                    <Dropdown.Item
+                      key={category}
+                      onClick={() => handleCategorySelect(category)}
+                    >
+                      {category}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
             </Form.Group>
           </Col>
         </Row>
@@ -186,16 +244,16 @@ const EditConfigurationElementPage = () => {
             onChange={handleImageChange}
           />
           {imagePreview ? (
-            <Image 
-              src={imagePreview} 
-              alt="Preview" 
+            <Image
+              src={imagePreview}
+              alt="Preview"
               fluid
               style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
             />
           ) : (
-            <Image 
-              src={element?.image || ''} 
-              alt="Preview" 
+            <Image
+              src={element?.image || ''}
+              alt="Preview"
               fluid
               style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
             />
@@ -218,7 +276,10 @@ const EditConfigurationElementPage = () => {
           <Button variant="primary" onClick={handleSubmit}>
             Сохранить изменения
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/configurations')}>
+          <Button variant="success" onClick={handleCreateNew}>
+            Добавить как новый элемент
+          </Button>
+          <Button variant="secondary" onClick={() => navigate(ROUTES.ELEMENTS)}>
             Отмена
           </Button>
         </div>

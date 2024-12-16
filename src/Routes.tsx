@@ -8,7 +8,8 @@ export const ROUTES = {
 	USER_APPLICATIONS: "/my-configurations", // Страница заявок пользователя
 	CONFIGURATION: "/configuration",
 	CONFIGURATIONS: "/configurations",
-	ELEMENTS_TABLE: "/edit-configuration-elements"
+	ELEMENTS_TABLE: "/edit-configuration-elements",
+	EDIT_ELEMENT: "/edit-configuration-element"
   };
   
   export type RouteKeyType = keyof typeof ROUTES;
@@ -22,6 +23,7 @@ export const ROUTES = {
 	USER_APPLICATIONS: "Мои заявки", // Подпись для страницы с заявками пользователя
 	CONFIGURATION: "Текущая конфигурация",
 	CONFIGURATIONS: "Ваши конфигурации",
-	ELEMENTS_TABLE: "Элементы конфигурации"
+	ELEMENTS_TABLE: "Элементы конфигурации",
+	EDIT_ELEMENT: "Редактирование элемента"
   };
   
