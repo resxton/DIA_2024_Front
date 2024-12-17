@@ -107,7 +107,7 @@ const ElementsPage: FC = () => {
           >
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
             <Badge pill bg={isAuthenticated ? 'primary' : 'secondary'} className="draft-count-badge">
-              {isAuthenticated ? draftElementsCount : 0} 
+              {isAuthenticated ? draftElementsCount : "–"} 
             </Badge>
           </div>
         </div>

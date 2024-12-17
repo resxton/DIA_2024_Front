@@ -14,18 +14,18 @@ interface AuthState {
   error: string | null;
 }
 
-// Функция для загрузки состояния аутентификации из localStorage
-const loadAuthFromLocalStorage = () => {
-  const savedAuth = localStorage.getItem('auth');
-  return savedAuth
-    ? JSON.parse(savedAuth)
-    : { isAuthenticated: false, user: { id: null, username: null, token: null, is_staff: null }, loading: 'idle', error: null };
-};
+// // Функция для загрузки состояния аутентификации из localStorage
+// const loadAuthFromLocalStorage = () => {
+//   const savedAuth = localStorage.getItem('auth');
+//   return savedAuth
+//     ? JSON.parse(savedAuth)
+//     : { isAuthenticated: false, user: { id: null, username: null, token: null, is_staff: null }, loading: 'idle', error: null };
+// };
 
-// Функция для сохранения состояния аутентификации в localStorage
-const saveAuthToLocalStorage = (auth: AuthState) => {
-  localStorage.setItem('auth', JSON.stringify(auth));
-};
+// // Функция для сохранения состояния аутентификации в localStorage
+// const saveAuthToLocalStorage = (auth: AuthState) => {
+//   localStorage.setItem('auth', JSON.stringify(auth));
+// };
 
 // Асинхронный thunk для логина
 export const loginAsync = createAsyncThunk(
@@ -82,8 +82,13 @@ export const logoutAsync = createAsyncThunk(
   }
 );
 
-// Начальное состояние, загружаем из localStorage
-const initialState: AuthState = loadAuthFromLocalStorage();
+// Начальное состояние (убрали загрузку из localStorage)
+const initialState: AuthState = {
+  isAuthenticated: false,
+  user: { id: null, username: null, token: null, is_staff: null },
+  loading: 'idle',
+  error: null,
+};
 
 const authSlice = createSlice({
   name: 'auth',
@@ -93,7 +98,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = { id: null, username: null, token: null, is_staff: null }; // Сбрасываем id
       state.error = null;
-      saveAuthToLocalStorage(state); // Сохраняем в localStorage
+      // saveAuthToLocalStorage(state); // Убрано сохранение в localStorage
     },
   },
   extraReducers: (builder) => {
@@ -107,7 +112,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload;
         state.loading = 'succeeded';
-        saveAuthToLocalStorage(state); // Сохраняем в localStorage
+        // saveAuthToLocalStorage(state); // Убрано сохранение в localStorage
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = 'failed';
@@ -124,7 +129,7 @@ const authSlice = createSlice({
         state.user = { id: null, username: null, token: null, is_staff: null }; // Сбрасываем id
         state.loading = 'succeeded';
         state.error = null;
-        saveAuthToLocalStorage(state); // Сохраняем в localStorage
+        // saveAuthToLocalStorage(state); // Убрано сохранение в localStorage
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.loading = 'failed';
