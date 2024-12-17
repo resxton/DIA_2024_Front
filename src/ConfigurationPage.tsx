@@ -5,25 +5,23 @@ import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from './redux/store';
+import { useSelector } from 'react-redux';
+import { RootState } from './redux/store';
 import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
 import CartElementCard from './components/CartElementCard';
 
 const ConfigurationPage: FC = () => {
-  const { id } = useParams(); // Get configuration ID from the URL
+  const { id } = useParams(); 
   const [configuration, setConfiguration] = useState<PlaneConfigurationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
-  const [configurationStatus, setConfigurationStatus] = useState<string>('');
-  const dispatch: AppDispatch = useDispatch(); // Типизируем dispatch
+  const [, setConfigurationStatus] = useState<string>('');
   const navigate = useNavigate();  // Инициализируем navigate
   const [error, setError] = useState('');
 
-  // Access authentication state from Redux store
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -36,7 +34,7 @@ const ConfigurationPage: FC = () => {
         setConfiguration(data);
       })
       .catch((error) => {
-        if (error.response && error.response.status === 403) {
+        if (error.response && (error.response.status === 403) || (error.response.status === 401)){
           setError('403');
         } else if (error.response && error.response.status === 404) {
           setError('404');
@@ -49,6 +47,13 @@ const ConfigurationPage: FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+    // Редирект при изменении isAuthenticated
+    useEffect(() => {
+      if (!isAuthenticated) {
+        navigate(ROUTES.PAGE_403); // Предполагается, что "/" — это ROUTES.HOME
+      }
+    }, [isAuthenticated, navigate]);
   
 
   useEffect(() => {

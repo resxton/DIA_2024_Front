@@ -3,7 +3,7 @@ import { Card, Button } from 'react-bootstrap';
 import defaultImage from "../assets/Default.jpeg";
 import './ElementCard.css';
 import { api } from '../api';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -87,7 +87,7 @@ export const ElementCard: FC<Props> = ({
         <div className="d-flex justify-content-between mt-3">
           {showAddButton && (
             <Button variant="success" onClick={() => handleAddToDraft(id)}>
-              Добавить в заявку
+              Добавить
             </Button>
           )}
           <Button variant="primary" onClick={handleMoreInfoClick} className="me-2">

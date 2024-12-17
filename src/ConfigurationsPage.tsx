@@ -4,7 +4,7 @@ import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationListResponse } from './api/Api';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import { useNavigate } from 'react-router-dom';
 import CustomNavbar from './components/CustomNavbar';

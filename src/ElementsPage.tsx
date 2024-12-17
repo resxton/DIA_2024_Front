@@ -62,7 +62,7 @@ const ElementsPage: FC = () => {
   // Функция для обновления количества элементов в корзине
   const handleAddToDraft = () => {
     setDraftElementsCount(prevCount => prevCount + 1);
-    window.location.reload();
+    navigate(ROUTES.ELEMENTS)
   };
 
   const handleGoToDraft = () => {
@@ -116,7 +116,8 @@ const ElementsPage: FC = () => {
           <Row className="w-100">
             {elements.map((element) => (
               <Col key={element.pk} xs={12} md={6} lg={4} className="mb-4">
-                <ElementCard
+                {isAuthenticated ? (
+                  <ElementCard
                   id={element.pk}
                   name={element.name}
                   price={element.price}
@@ -125,6 +126,19 @@ const ElementsPage: FC = () => {
                   detail_text={element.detail_text}
                   onAddToDraft={handleAddToDraft}
                 />
+                ) : (
+                <ElementCard
+                  id={element.pk}
+                  name={element.name}
+                  price={element.price}
+                  category={element.category}
+                  image={element.image}
+                  detail_text={element.detail_text}
+                  onAddToDraft={handleAddToDraft}
+                  showAddButton = {false}
+                />
+                )}
+                
               </Col>
             ))}
           </Row>

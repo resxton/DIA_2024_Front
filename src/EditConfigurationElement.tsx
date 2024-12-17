@@ -29,6 +29,12 @@ const EditConfigurationElementPage = () => {
   ];
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.PAGE_403); 
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     if (!id) {
       setError("ID элемента не найден");
       return;

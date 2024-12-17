@@ -3,12 +3,18 @@ import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { api } from './api';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import CustomNavbar from './components/CustomNavbar';
 
 const RegisterPage: FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null); // Состояние для ошибки
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -24,6 +30,7 @@ const RegisterPage: FC = () => {
       // Если регистрация прошла успешно
       alert('Регистрация прошла успешно!');
       setError(null); 
+      navigate(ROUTES.LOGIN)
     } catch (error) {
       // Если ошибка при создании пользователя
       setError('Ошибка регистрации. Попробуйте снова.');
@@ -33,6 +40,10 @@ const RegisterPage: FC = () => {
   return (
     <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
       <Row className="w-100">
+        <CustomNavbar
+          isAuthenticated={isAuthenticated}
+          user={user}
+        />
         <BreadCrumbs
           crumbs={[
             { label: ROUTE_LABELS.REGISTER, path: ROUTES.REGISTER }

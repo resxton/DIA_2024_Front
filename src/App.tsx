@@ -12,6 +12,7 @@ import ConfigurationPage from "./ConfigurationPage";
 import ConfigurationsPage from "./ConfigurationsPage";
 import ConfigurationElementsTable from "./ConfigurationElementsTable";
 import EditConfigurationElement from "./EditConfigurationElement";
+import CreateConfigurationElementPage from "./CreateConfigurationElementPage";
 
 function App() {
   return (
@@ -27,10 +28,10 @@ function App() {
         <Route path={ROUTES.CONFIGURATIONS} element={<ConfigurationsPage />} />
         <Route path={ROUTES.ELEMENTS_TABLE} element={<ConfigurationElementsTable />} />
         <Route path={`${ROUTES.ELEMENTS_TABLE}/:id`} element={<EditConfigurationElement />} />
-        
+        <Route path={ROUTES.CREATE_ELEMENT} element={<CreateConfigurationElementPage />} />
         {/* Страницы ошибок */}
-        <Route path="/403" element={<ForbiddenPage />} />
-        <Route path="/404" element={<NotFoundPage />} />
+        <Route path={ROUTES.PAGE_403} element={<ForbiddenPage />} />
+        <Route path={ROUTES.PAGE_404} element={<NotFoundPage />} />
         
         {/* Страница по умолчанию для несуществующих маршрутов */}
         <Route path="*" element={<NotFoundPage />} />

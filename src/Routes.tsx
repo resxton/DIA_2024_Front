@@ -9,7 +9,10 @@ export const ROUTES = {
 	CONFIGURATION: "/configuration",
 	CONFIGURATIONS: "/configurations",
 	ELEMENTS_TABLE: "/edit-configuration-elements",
-	EDIT_ELEMENT: "/edit-configuration-element"
+	EDIT_ELEMENT: "/edit-configuration-element",
+	CREATE_ELEMENT: "/create-configuration-element",
+	PAGE_403: "/403",
+	PAGE_404: "/404"
   };
   
   export type RouteKeyType = keyof typeof ROUTES;
@@ -24,6 +27,9 @@ export const ROUTES = {
 	CONFIGURATION: "Текущая конфигурация",
 	CONFIGURATIONS: "Конфигурации",
 	ELEMENTS_TABLE: "Элементы конфигурации",
-	EDIT_ELEMENT: "Редактирование элемента"
+	EDIT_ELEMENT: "Редактирование элемента",
+	CREATE_ELEMENT: "Создание элемента",
+	PAGE_403: "403",
+	PAGE_404: "404"
   };
   

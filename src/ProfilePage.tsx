@@ -5,7 +5,7 @@ import { ROUTES, ROUTE_LABELS } from './Routes';
 import { api } from './api';
 import { User } from './api/Api';
 import { useSelector } from 'react-redux';
-import { RootState } from './redux/store'; // Путь к файлу, где находится ваш store
+import CustomNavbar from './components/CustomNavbar';
 
 const ProfilePage: FC = () => {
   const [username, setUsername] = useState('');
@@ -15,9 +15,8 @@ const ProfilePage: FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
-  // Получаем userId из Redux
-  const { user } = useSelector((state: RootState) => state.auth);
   const userId = user?.id; // Получаем ID пользователя из стора, предполагая, что оно хранится там
 
   const handleProfileUpdate = async () => {
@@ -54,6 +53,7 @@ const ProfilePage: FC = () => {
           Authorization: `Bearer ${user.token}`,
         },
       });
+      console.log(response.data)
 
       setSuccessMessage('Данные успешно обновлены');
     } catch (err) {
@@ -65,6 +65,8 @@ const ProfilePage: FC = () => {
   return (
     <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
       <Row className="w-100">
+        <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
+
         <BreadCrumbs
           crumbs={[
             { label: ROUTE_LABELS.USER_DASHBOARD, path: ROUTES.USER_DASHBOARD }

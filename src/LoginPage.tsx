@@ -23,7 +23,7 @@ const LoginPage: FC = () => {
     );
 
     if (loginAsync.fulfilled.match(resultAction)) {
-      navigate('/configuration-elements');
+      navigate(ROUTES.HOME);
     }
   };
 

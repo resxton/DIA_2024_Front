@@ -43,13 +43,17 @@ const ConfigurationElementsTable = () => {
   // Редирект при изменении isAuthenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(ROUTES.ELEMENTS); // Предполагается, что "/" — это ROUTES.HOME
+      navigate(ROUTES.PAGE_403); // Предполагается, что "/" — это ROUTES.HOME
     }
   }, [isAuthenticated, navigate]);
 
   const handleEditClick = (id: number) => {
     navigate(`${ROUTES.ELEMENTS_TABLE}/${id}`);
   };
+
+  const handleAddClick = () => {
+    navigate(ROUTES.CREATE_ELEMENT)
+  }
 
   const handleDeleteClick = (id: number) => {
     const confirmDelete = window.confirm(
@@ -79,42 +83,41 @@ const ConfigurationElementsTable = () => {
         <h2 className="mb-4">Элементы конфигурации</h2>
 
         {elements && elements.length > 0 ? (
-          <Table striped bordered hover responsive className="w-100">
-            <thead>
-              <tr>
-                <th>Наименование</th>
-                <th>Цена</th>
-                <th>Категория</th>
-                <th style={{ width: '350px', wordWrap: 'break-word' }}>Основная информация</th> {/* Сужаем столбец */}
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {elements.map((element) => (
-                <tr key={element.pk}>
-                  <td>{element.name}</td>
-                  <td>$ {element.price}</td>
-                  <td>{element.category}</td>
-                  <td>{element.key_info}</td>
-                  <td style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Button variant="outline-primary" onClick={() => handleEditClick(element.pk)}>
-                      Редактировать
-                    </Button>
-                    <Button
-                      variant="danger"
-                      style={{ flexGrow: 1, marginLeft: '5px' }}
-                      onClick={() => handleDeleteClick(element.pk)}
-                    >
-                      Удалить
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div>
+            <Table striped bordered hover responsive className="w-100">
+              <thead>
+                <tr><th>Наименование</th><th>Цена</th><th>Категория</th><th style={{ width: '350px', wordWrap: 'break-word' }}>Основная информация</th><th>Действия</th></tr>
+              </thead>
+              <tbody>
+                {elements.map((element) => (
+                  <tr key={element.pk}>
+                    <td>{element.name}</td>
+                    <td>$ {element.price}</td>
+                    <td>{element.category}</td>
+                    <td>{element.key_info}</td>
+                    <td style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Button variant="outline-primary" onClick={() => handleEditClick(element.pk)}>
+                        Редактировать
+                      </Button>
+                      <Button
+                        variant="danger"
+                        style={{ flexGrow: 1, marginLeft: '5px' }}
+                        onClick={() => handleDeleteClick(element.pk)}
+                      >
+                        Удалить
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
         ) : (
           <p>Нет элементов для отображения.</p>
         )}
+        <Button className='mt-4 mb-4' variant="outline-primary" onClick={handleAddClick}>
+          Создать новый элемент конфигурации
+        </Button>
       </Container>
     </div>
   );
