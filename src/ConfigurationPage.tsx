@@ -5,11 +5,12 @@ import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
 import CartElementCard from './components/CartElementCard';
+import { clearDraft } from './redux/configurationElementsSlice';
 
 const ConfigurationPage: FC = () => {
   const { id } = useParams(); 
@@ -20,6 +21,7 @@ const ConfigurationPage: FC = () => {
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [, setConfigurationStatus] = useState<string>('');
   const navigate = useNavigate();  // Инициализируем navigate
+  const dispatch = useDispatch()
   const [error, setError] = useState('');
 
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -190,11 +192,9 @@ const ConfigurationPage: FC = () => {
   const handleDeleteConfiguration = (configurationId: number) => {
     api.planeConfiguration.planeConfigurationDelete(configurationId)
       .then(() => {
+        clearDraft()
         // Редирект на страницу с элементами
         navigate(ROUTES.ELEMENTS);  // Переход к роуту /elements (или другой путь, если нужно)
-
-        // Здесь можно добавить уведомление об успешном удалении
-        alert('Конфигурация успешно удалена.');
       })
       .catch((error) => {
         // Обрабатываем ошибку удаления

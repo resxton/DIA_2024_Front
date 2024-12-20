@@ -28,6 +28,10 @@ function App() {
             background-color: #333333;
             border-color: #333333;
           }
+          .btn-primary:active {
+            background-color: #FFFFFF;
+            border-color: #000000;
+          }
         `}
       </style>
       <Routes>

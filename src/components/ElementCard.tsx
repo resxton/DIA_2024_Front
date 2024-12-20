@@ -2,9 +2,11 @@ import { FC } from 'react';
 import { Card, Button } from 'react-bootstrap';
 import defaultImage from "../assets/Default.jpeg";
 import './ElementCard.css';
-import { api } from '../api';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { addElementToDraft, fetchConfigurationElements } from '../redux/configurationElementsSlice';  // Импортируем экшен
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../Routes';
+import { RootState } from '../redux/store';
 
 interface Props {
   id: number;
@@ -13,7 +15,6 @@ interface Props {
   category: string;
   image?: string;
   detail_text: string;
-  onAddToDraft: () => void;  // Функция для обновления количества
   showAddButton?: boolean;  // Новый пропс для контроля отображения кнопки
 }
 
@@ -23,43 +24,32 @@ export const ElementCard: FC<Props> = ({
   price,
   category,
   image,
-  onAddToDraft,
   showAddButton = true,  // По умолчанию кнопка отображается
 }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { category: selectedCategory, minPrice, maxPrice } = useSelector(
+    (state: RootState) => state.filter
+  );
 
   const handleAddToDraft = async (id: number) => {
     try {
-      console.log("Добавляем элемент с ID:", id);  // Печатаем ID добавляемого элемента
-      const response = await api.planeConfigurationElement.planeConfigurationElementCreate(id, {
-        withCredentials: true, // Убедитесь, что с запросом передаются куки
-      });
-      console.log("Элемент успешно добавлен:", response);
-      alert("Элемент добавлен в заявку");
-      onAddToDraft();  // Обновляем количество в корзине
+      console.log("Добавляем элемент с ID:", id);
+      const action = await dispatch(addElementToDraft(id) as any);  // Запускаем asyncThunk
+      if (addElementToDraft.fulfilled.match(action)) {
+        dispatch(fetchConfigurationElements({ 
+          category: selectedCategory, 
+          price_min: minPrice, 
+          price_max: maxPrice 
+        }) as any);
+      } else {
+        alert("Произошла ошибка при добавлении элемента.");
+      }
     } catch (error: unknown) {
       console.error("Ошибка при добавлении элемента:", error);
-  
-      if (axios.isAxiosError(error)) {
-        switch (error.response?.status) {
-          case 400:
-            alert("Этот элемент уже добавлен в конфигурацию.");
-            break;
-          case 401:
-            alert("Необходима аутентификация. Пожалуйста, войдите в систему.");
-            break;
-          case 404:
-            alert("Пользователь не найден.");
-            break;
-          default:
-            alert("Произошла ошибка при добавлении элемента.");
-        }
-      } else {
-        alert("Произошла ошибка. Повторите попытку позже.");
-      }
+      alert("Произошла ошибка. Повторите попытку позже.");
     }
   };
-
-  const navigate = useNavigate();
 
   const handleMoreInfoClick = () => {
     navigate(`/configuration-elements/${id}`);
@@ -98,6 +88,5 @@ export const ElementCard: FC<Props> = ({
     </Card>
   );
 };
-
 
 export default ElementCard;
