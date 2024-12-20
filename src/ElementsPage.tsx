@@ -61,7 +61,7 @@ const ElementsPage: FC = () => {
   
   // Функция для обновления количества элементов в корзине
   const handleAddToDraft = () => {
-    setDraftElementsCount(prevCount => prevCount + 1);
+    setDraftElementsCount(prevCount =>prevCount + 1);
     navigate(ROUTES.ELEMENTS)
   };
 
@@ -106,8 +106,8 @@ const ElementsPage: FC = () => {
             style={{ cursor: isAuthenticated ? 'pointer' : 'normal' }}
           >
             <img src={planeIcon} alt="Cart Icon" width={30} height={30} />
-            <Badge pill bg={isAuthenticated ? 'primary' : 'secondary'} className="draft-count-badge">
-              {isAuthenticated ? draftElementsCount : "–"} 
+            <Badge pill bg={isAuthenticated && draftID != -1 ? 'primary' : 'secondary'} className="draft-count-badge">
+              {isAuthenticated && draftID != -1 ? draftElementsCount : "–"} 
             </Badge>
           </div>
         </div>

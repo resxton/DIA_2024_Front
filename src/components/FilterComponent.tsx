@@ -45,12 +45,16 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           Категория
         </Form.Label>
         <Col sm={5}>
-          <Dropdown>
-            <Dropdown.Toggle id="dropdown-category">
+          <Dropdown >
+            <Dropdown.Toggle id="dropdown-category" style={ {
+        backgroundColor: "#000",
+        color: '#fff',
+        border: 'none',
+      } }>
               {category || 'Выберите категорию'}
             </Dropdown.Toggle>
 
-            <Dropdown.Menu>
+            <Dropdown.Menu >
               <Dropdown.Item onClick={() => handleCategorySelect('')}>
                 Выберите категорию
               </Dropdown.Item>
@@ -106,7 +110,11 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         </Col>
       </Form.Group>
 
-      <Button type="submit" className="filter-btn">
+      <Button type="submit" className="filter-btn" style={ {
+        backgroundColor: "#000",
+        color: '#fff',
+        border: 'none',
+      } }>
         Фильтровать
       </Button>
     </Form>

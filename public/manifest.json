@@ -3,8 +3,8 @@
 	"short_name": "Plane confgiuration system",
 	"start_url": "/PlaneConfigurationSystem",
 	"display": "standalone",
-	"background_color": "#0F4FF4",
-	"theme_color": "#0F4FF4",
+	"background_color": "#000000",
+	"theme_color": "#000000",
 	"orientation": "portrait-primary",
 	"icons": [
 		{

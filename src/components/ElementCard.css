@@ -23,4 +23,30 @@
     width: 100%;
 }
 
+/* Для кнопки "Подробнее" */
+.detailButton {
+    background-color: black !important;
+    color: white !important;
+    border: 1px solid transparent !important;
+  }
+  
+  .detailButton:hover {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+  
+/* Для кнопки "Добавить в корзину" */
+.addButton {
+    background-color: #1b8519 !important;  /* Зеленый оттенок */
+    color: white !important;
+    border: 1px solid #1b8519 !important;
+}
+
+.addButton:hover {
+background-color: white !important;  /* Темнее для hover-эффекта */
+color: #1b8519 !important;
+}
+  
+  
 

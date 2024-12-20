@@ -23,6 +23,13 @@ const ConfigurationElementsTable = () => {
       })
       .catch((error) => {
         console.error('Ошибка загрузки элементов', error);
+        if (error === '403') {
+          navigate('/403')
+        }
+      
+        if (error === '404') {
+          navigate('/404')
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -96,7 +103,7 @@ const ConfigurationElementsTable = () => {
                     <td>{element.category}</td>
                     <td>{element.key_info}</td>
                     <td style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Button variant="outline-primary" onClick={() => handleEditClick(element.pk)}>
+                      <Button variant="primary" onClick={() => handleEditClick(element.pk)}>
                         Редактировать
                       </Button>
                       <Button
@@ -115,7 +122,7 @@ const ConfigurationElementsTable = () => {
         ) : (
           <p>Нет элементов для отображения.</p>
         )}
-        <Button className='mt-4 mb-4' variant="outline-primary" onClick={handleAddClick}>
+        <Button className='mt-4 mb-4' variant="primary" onClick={handleAddClick}>
           Создать новый элемент конфигурации
         </Button>
       </Container>

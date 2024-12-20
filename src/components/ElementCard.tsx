@@ -86,11 +86,11 @@ export const ElementCard: FC<Props> = ({
         </div>
         <div className="d-flex justify-content-between mt-3">
           {showAddButton && (
-            <Button variant="success" onClick={() => handleAddToDraft(id)}>
+            <Button className="addButton" variant="success" onClick={() => handleAddToDraft(id)}>
               Добавить
             </Button>
           )}
-          <Button variant="primary" onClick={handleMoreInfoClick} className="me-2">
+          <Button variant="primary" onClick={handleMoreInfoClick} className="me-2 detailButton">
             Подробнее
           </Button>
         </div>

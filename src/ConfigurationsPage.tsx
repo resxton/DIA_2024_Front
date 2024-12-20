@@ -77,7 +77,6 @@ const ConfigurationsPage: FC = () => {
   };
   
   const handleFilterChange = (status: string, startDate: string, endDate: string) => {
-    // Обновляем локальное состояние с новыми фильтрами
     setFilters({
       status,
       created_after: startDate,
@@ -88,14 +87,8 @@ const ConfigurationsPage: FC = () => {
 
   useEffect(() => {
   const fetchData = () => fetchConfigurations(filters);
-
-  // Первоначальная загрузка данных
   fetchData();
-
-  // Установка интервала для шорт-поллинга
   const intervalId = setInterval(fetchData, 2000);
-
-  // Очистка интервала при размонтировании компонента
   return () => clearInterval(intervalId);
 }, [filters]);
 
@@ -165,7 +158,7 @@ const ConfigurationsPage: FC = () => {
             </thead>
             <tbody>
               {filteredConfigurations.configurations
-                .sort((a, b) => a.pk - b.pk) // Sorting by pk in ascending order
+                .sort((a, b) => a.pk - b.pk) 
                 .map((configuration) => (
                   <tr key={configuration.pk}>
                     <td>{configuration.pk}</td>

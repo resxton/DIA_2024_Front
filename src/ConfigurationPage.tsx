@@ -131,41 +131,38 @@ const ConfigurationPage: FC = () => {
 
 
   const handleUpdateQuantity = (elementId: number, action: 'increment' | 'decrement') => {
-    if (!configuration || !Array.isArray(configuration.counts)) return;  // Проверка на наличие и корректность типа
+    if (!configuration || !Array.isArray(configuration.counts)) return;
   
-    const updatedCounts = [...configuration.counts];
     const elementIndex = configuration.configuration_elements.findIndex(
       (element) => element.pk === elementId
     );
   
     if (elementIndex !== -1) {
-      let newCount = action === 'increment' ? updatedCounts[elementIndex] + 1 : updatedCounts[elementIndex] - 1;
+      const updatedCounts = [...configuration.counts];
+      const newCount = action === 'increment' 
+        ? updatedCounts[elementIndex] + 1 
+        : updatedCounts[elementIndex] - 1;
   
-      // Если количество уменьшилось до 0, вызываем удаление
       if (newCount <= 0) {
-        api.configurationMap.configurationMapDelete(configuration.configuration.pk, elementId)
-          .then(() => {
-            updatedCounts[elementIndex] = 0; // Обновляем количество в локальном состоянии
-            window.location.reload(); // Перезагружаем страницу после удаления
-          })
-          .catch((error) => {
-            console.error('Ошибка при удалении элемента:', error);
-          });
+        handleDeleteElement(elementId);
       } else {
-        // Если количество больше 0, просто обновляем
-        updatedCounts[elementIndex] = newCount;
-  
-        // Вызов API для обновления количества
-        api.configurationMap.configurationMapUpdate({ count: newCount }, configuration.configuration.pk, elementId)
+        api.configurationMap.configurationMapUpdate(
+          { count: newCount },
+          configuration.configuration.pk,
+          elementId
+        )
           .then(() => {
-            window.location.reload();  // Перезагружаем страницу после обновления
+            updatedCounts[elementIndex] = newCount;
+            setConfiguration({
+              ...configuration,
+              counts: updatedCounts,
+            });
           })
-          .catch((error) => {
-            console.error('Ошибка при обновлении количества:', error);
-          });
+          .catch((error) => console.error('Ошибка при обновлении количества:', error));
       }
     }
   };
+  
   
 
   const handleDeleteElement = (elementId: number) => {

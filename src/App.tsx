@@ -16,7 +16,20 @@ import CreateConfigurationElementPage from "./CreateConfigurationElementPage";
 
 function App() {
   return (
+    
     <BrowserRouter basename="/PlaneConfigurationSystem">
+      <style>
+        {`
+          .btn-primary {
+            background-color: #000000;
+            border-color: #000000;
+          }
+          .btn-primary:hover {
+            background-color: #333333;
+            border-color: #333333;
+          }
+        `}
+      </style>
       <Routes>
         <Route path={ROUTES.HOME} index element={<HomePage />} />
         <Route path={ROUTES.ELEMENTS} element={<ElementsPage />} />
