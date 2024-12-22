@@ -52,7 +52,16 @@ export const deleteConfiguration = createAsyncThunk(
 	}
   );
   
-  // Асинхронный экшн для обновления конфигурации
+// Асинхронный экшн для подтверждения конфигурации (смена статуса)
+export const confirmConfiguration = createAsyncThunk(
+	'configuration/confirmConfiguration',
+	async (configurationId: string) => {
+	  await api.planeConfiguration.planeConfigurationSubmitUpdate(configurationId); // Используем API для подтверждения
+	  return configurationId; // Возвращаем ID подтвержденной конфигурации
+	}
+  );
+  
+  // Асинхронный экшн для изменения конфигурации (обновление полей)
   export const updateConfiguration = createAsyncThunk(
 	'configuration/updateConfiguration',
 	async ({ configurationId, updatedConfiguration }: { configurationId: string, updatedConfiguration: Configuration }) => {
@@ -118,9 +127,9 @@ export const configurationSlice = createSlice({
       })
       .addCase(updateConfiguration.fulfilled, (state, action) => {
         if (state.configuration) {
-          state.configuration = { ...state.configuration, ...action.payload }; // Обновляем конфигурацию
+          state.configuration.configuration = { ...state.configuration.configuration, ...action.payload }; // Обновляем конфигурацию
         }
-      });  
+      })  
   }
 });
 

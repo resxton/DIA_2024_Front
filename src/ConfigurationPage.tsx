@@ -11,7 +11,7 @@ import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
 import { clearDraft } from './redux/configurationElementsSlice';
 import defaultImage from './assets/Default.jpeg';
-import { deleteConfiguration, deleteElement, fetchConfiguration, updateElementCount } from './redux/configurationSlice';
+import { confirmConfiguration, deleteConfiguration, deleteElement, fetchConfiguration, updateConfiguration, updateElementCount } from './redux/configurationSlice';
 
 
 const ConfigurationPage: FC = () => {
@@ -21,15 +21,26 @@ const ConfigurationPage: FC = () => {
   const { configuration, loading, error } = useSelector((state: RootState) => state.configuration);
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+
+  const [customerName, setCustomerName] = useState(configuration?.configuration.customer_name || '');
+  const [customerPhone, setCustomerPhone] = useState(configuration?.configuration.customer_phone || '');
+  const [customerEmail, setCustomerEmail] = useState(configuration?.configuration.customer_email || '');
+
 
   useEffect(() => {
     if (id) {
       dispatch(fetchConfiguration(Number(id)) as any);
     }
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (configuration) {
+      setCustomerName(configuration.configuration.customer_name || '');
+      setCustomerPhone(configuration.configuration.customer_phone || '');
+      setCustomerEmail(configuration.configuration.customer_email || '');
+    }
+  }, [configuration]);
+  
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -60,13 +71,36 @@ const ConfigurationPage: FC = () => {
   
 
 // Обработчик для подтверждения конфигурации
-const handleConfirm = () => {
-  
+const handleConfirmConfiguration = () => {
+  if (!id) return;
+
+  dispatch(confirmConfiguration(id) as any)
+    .then(() => {
+      navigate(ROUTES.ELEMENTS);
+    })
+    .catch((error: any) => {
+      console.error('Ошибка при подтверждении конфигурации:', error);
+    });
 };
 
-// Обработчик для изменения конфигурации
-const handleEdit = () => {
-  
+const handleEditConfiguration = () => {
+  if (!id || !configuration) return;
+
+  console.log(customerName, customerEmail, customerPhone)
+  const updatedConfiguration = {
+    ...configuration.configuration,
+    customer_name: customerName,
+    customer_phone: customerPhone,
+    customer_email: customerEmail,
+  };
+
+  dispatch(updateConfiguration({ configurationId: id, updatedConfiguration }) as any)
+    .then(() => {
+      // navigate(ROUTES.ELEMENTS);
+    })
+    .catch((error: any) => {
+      console.error('Ошибка при обновлении конфигурации:', error);
+    });
 };
 
 const handleDeleteConfiguration = () => {
@@ -153,8 +187,8 @@ const handleDeleteConfiguration = () => {
                       <Col md={6}>
                         <Form.Group className="mb-3">
                           <Form.Label>Покупатель</Form.Label>
-                          <Form.Control 
-                            type="text" 
+                          <Form.Control
+                            type="text"
                             value={customerName}
                             onChange={(e) => setCustomerName(e.target.value)}
                           />
@@ -338,8 +372,8 @@ const handleDeleteConfiguration = () => {
 
             {configuration && configuration.configuration.status === 'draft' && (
               <div>
-                <Button variant="primary" onClick={handleConfirm} className="m-2">Подтвердить конфигурацию</Button>
-                <Button variant="warning" onClick={handleEdit} className="m-2">Изменить конфигурацию</Button>
+                <Button variant="primary" onClick={handleConfirmConfiguration} className="m-2">Подтвердить конфигурацию</Button>
+                <Button variant="warning" onClick={handleEditConfiguration} className="m-2">Изменить конфигурацию</Button>
                 <Button variant="danger" onClick={handleDeleteConfiguration} className="m-2">Удалить конфигурацию</Button>
               </div>
             )}
