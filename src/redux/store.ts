@@ -5,13 +5,17 @@ import authReducer from './authSlice'; // Импортируем редюсер 
 import configurationElementsReducer from './configurationElementsSlice';
 import configurationReducer from './configurationSlice'
 import loggerMiddleware from './loggerMiddleware';
+import elementsTableReducer from './elementsTableSlice'
+import createElementReducer from './createElementSlice'
 
 export const store = configureStore({
   reducer: {
     filter: filterReducer, 
     auth: authReducer, 
     configurationElements: configurationElementsReducer,
-    configuration: configurationReducer
+    configuration: configurationReducer,
+    elementsTable: elementsTableReducer,
+    createElement: createElementReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(loggerMiddleware), // Добавление loggerMiddleware

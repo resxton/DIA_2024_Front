@@ -1,48 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Card, Button, Container } from 'react-bootstrap';
-import { api } from './api';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchElements, deleteElement } from './redux/elementsTableSlice'; // Импортируем из нового слайса
 import { ConfigurationElement } from './api/Api';
 import CustomNavbar from './components/CustomNavbar';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from './Routes';
 import defaultImage from './assets/Default.jpeg';
 
 const ConfigurationElementsTable = () => {
-  const [elements, setElements] = useState<ConfigurationElement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const fetchData = () => {
-    api.planeConfigurationElements
-      .planeConfigurationElementsList()
-      .then((response) => {
-        setElements(response.data.configuration_elements || []);
-      })
-      .catch((error) => {
-        console.error('Ошибка загрузки элементов', error);
-        if (error === '403') {
-          navigate('/403');
-        }
-        if (error === '404') {
-          navigate('/404');
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const { elements, loading, error } = useSelector((state: any) => state.elementsTable); // Обновляем ссылку на слайс
 
   useEffect(() => {
-    fetchData();
-
-    const interval = setInterval(() => {
-      fetchData(); // Fetch every 2 seconds
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
+    dispatch(fetchElements() as any);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -63,21 +37,16 @@ const ConfigurationElementsTable = () => {
       'Вы уверены, что хотите удалить этот элемент? Данное действие нельзя отменить.'
     );
     if (confirmDelete) {
-      api.planeConfigurationElement
-        .planeConfigurationElementDelete(id.toString())
-        .then(() => {
-          alert('Элемент успешно удален.');
-          fetchData();
-        })
-        .catch((error) => {
-          console.error('Ошибка при удалении элемента:', error);
-          alert('Ошибка при удалении элемента. Попробуйте еще раз.');
-        });
+      dispatch(deleteElement(id.toString()) as any);
     }
   };
 
   if (loading) {
     return <div>Загрузка...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
@@ -88,7 +57,7 @@ const ConfigurationElementsTable = () => {
 
         {elements && elements.length > 0 ? (
           <div>
-            {elements.map((element) => (
+            {elements.map((element: ConfigurationElement) => (
               <Card key={element.pk} className="mb-3 shadow-sm">
                 <Card.Body style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   {/* Используем image из элемента */}

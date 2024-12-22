@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Form, Container, Alert, Row, Col, Dropdown } from 'react-bootstrap';
-import { api } from './api';
-import { ROUTES } from './Routes';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Form, Container, Alert, Row, Col, Image, Dropdown } from 'react-bootstrap';
 import { ConfigurationElement } from './api/Api';
-import CustomNavbar from './components/CustomNavbar';
+import { useDispatch, useSelector } from 'react-redux';
+import { createConfigurationElement, clearError } from './redux/createElementSlice';
 import { RootState } from './redux/store';
-import { useSelector } from 'react-redux';
+import CustomNavbar from './components/CustomNavbar';
 import { BreadCrumbs } from './components/BreadCrumbs';
+import { ROUTES, ROUTE_LABELS } from './Routes';
 
 const CreateConfigurationElementPage = () => {
+  const { id } = useParams();
+  const [formData, setFormData] = useState<ConfigurationElement | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { loading, error } = useSelector((state: RootState) => state.createElement);
 
   const categories = [
     'Компоновка салона',
@@ -21,78 +27,73 @@ const CreateConfigurationElementPage = () => {
     'Кресло',
   ];
 
-  const [formData, setFormData] = useState<Partial<ConfigurationElement>>({
-    name: '',
-    price: 0,
-    key_info: '',
-    category: '',
-    image: '',
-    detail_text: '',
-    is_deleted: false,
-  });
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.PAGE_403);
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
-      ...formData,
+      ...formData!,
       [name]: value,
     });
   };
 
   const handleCategorySelect = (category: string) => {
     setFormData({
-      ...formData,
+      ...formData!,
       category,
     });
   };
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(ROUTES.PAGE_403); // Предполагается, что "/" — это ROUTES.HOME
-    }
-  }, [isAuthenticated, navigate]);
-
-  const handleSubmit = async () => {
-    try {
-      // Создаем объект ConfigurationElement
-      const configurationElementData: ConfigurationElement= {
-		pk: 0,
-        name: formData.name || '',
-        price: formData.price || 0,
-        key_info: formData.key_info || '',
-        category: formData.category || '',
-        image: '', // URL изображения будет обновлен отдельно
-        detail_text: formData.detail_text || '',
-        is_deleted: false,
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
       };
-
-      // Отправляем основной объект без изображения
-      const response = await api.planeConfigurationElements.planeConfigurationElementsCreate(
-        configurationElementData
-      );
-	  console.log(response.data)
-
-      alert('Элемент успешно создан!');
-      navigate(ROUTES.ELEMENTS);
-    } catch (error) {
-      console.error(error);
-      setError('Ошибка при создании элемента.');
+      reader.readAsDataURL(file);
+      setImageFile(file);
     }
   };
+
+  const handleCreateNew = async () => {
+    if (formData) {
+      const { name, price, key_info, category, detail_text } = formData;
+      if (!name || !price || !key_info || !category || !detail_text) {
+        return; // Можно показать ошибку по аналогии с прошлым кодом
+      }
+
+      dispatch(createConfigurationElement({ formData, imageFile }) as any);
+      if (!loading && !error) {
+        navigate(ROUTES.ELEMENTS_TABLE);
+      }
+    }
+  };
+
+  if (loading) {
+    return <div>Загрузка...</div>;
+  }
+
+  if (error) {
+    return <Alert variant="danger">{error}</Alert>;
+  }
 
   return (
     <Container fluid className="mt-4">
       <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
       <BreadCrumbs
         crumbs={[
-          { label: 'Элементы', path: ROUTES.ELEMENTS },
-          { label: 'Создать элемент', path: '' },
+          { label: ROUTE_LABELS.ELEMENTS_TABLE, path: ROUTES.ELEMENTS_TABLE },
+          { label: ROUTE_LABELS.EDIT_ELEMENT, path: ROUTES.EDIT_ELEMENT },
         ]}
       />
-      <h2 className='m-4'>Создать новый элемент конфигурации</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form className="m-4">
+      <h2 className="mt-4 p-4">Редактировать элемент конфигурации</h2>
+      <Form className="mt-3 p-4">
+        {/* Все формы и элементы инпута */}
         <Row>
           <Col md={6}>
             <Form.Group controlId="name">
@@ -100,7 +101,7 @@ const CreateConfigurationElementPage = () => {
               <Form.Control
                 type="text"
                 name="name"
-                value={formData.name}
+                value={formData?.name || ''}
                 onChange={handleInputChange}
                 placeholder="Введите наименование"
               />
@@ -112,14 +113,13 @@ const CreateConfigurationElementPage = () => {
               <Form.Control
                 type="number"
                 name="price"
-                value={formData.price}
+                value={formData?.price || ''}
                 onChange={handleInputChange}
                 placeholder="Введите цену"
               />
             </Form.Group>
           </Col>
         </Row>
-
         <Row className="mt-3">
           <Col md={6}>
             <Form.Group controlId="key_info">
@@ -127,7 +127,7 @@ const CreateConfigurationElementPage = () => {
               <Form.Control
                 type="text"
                 name="key_info"
-                value={formData.key_info}
+                value={formData?.key_info || ''}
                 onChange={handleInputChange}
                 placeholder="Введите основную информацию"
               />
@@ -138,7 +138,7 @@ const CreateConfigurationElementPage = () => {
               <Form.Label>Категория</Form.Label>
               <Dropdown>
                 <Dropdown.Toggle variant="outline-secondary">
-                  {formData.category || 'Выберите категорию'}
+                  {formData?.category || 'Выберите категорию'}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   {categories.map((category) => (
@@ -155,24 +155,45 @@ const CreateConfigurationElementPage = () => {
           </Col>
         </Row>
 
+        <Form.Group controlId="image" className="mt-3">
+          <Form.Label>Изображение</Form.Label>
+          <Form.Control
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          {imagePreview ? (
+            <Image
+              src={imagePreview}
+              alt="Preview"
+              fluid
+              style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
+            />
+          ) : (
+            <Image
+              src={formData?.image || ''}
+              alt="Preview"
+              fluid
+              style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
+            />
+          )}
+        </Form.Group>
+
         <Form.Group controlId="detail_text" className="mt-3">
           <Form.Label>Подробное описание</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             name="detail_text"
-            value={formData.detail_text}
+            value={formData?.detail_text || ''}
             onChange={handleInputChange}
             placeholder="Введите подробное описание"
           />
         </Form.Group>
-
         <div className="mt-4 d-flex justify-content-between">
-          <Button variant="primary" onClick={handleSubmit}>
-            Создать элемент
-          </Button>
-          <Button variant="secondary" onClick={() => navigate(ROUTES.ELEMENTS_TABLE)}>
-            Отмена
+          <Button variant="success" onClick={handleCreateNew}>
+            Создать 
           </Button>
         </div>
       </Form>

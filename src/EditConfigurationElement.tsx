@@ -135,18 +135,28 @@ const EditConfigurationElementPage = () => {
       setLoading(true);
 
       try {
-        await api.planeConfigurationElements
+        const newElementResponse = await api.planeConfigurationElements
           .planeConfigurationElementsCreate({
             ...formData,
-          })
-          .then(() => {
-            alert('Новый элемент успешно создан!');
-            navigate(ROUTES.ELEMENTS);
-          })
-          .catch((error) => {
-            setError('Ошибка при создании нового элемента');
-            console.error(error);
           });
+
+        // После того как элемент создан, проверим, есть ли файл изображения
+        if (imageFile) {
+          const newElementId = newElementResponse.data.pk as unknown as string;
+          await api.planeConfigurationElement
+            .planeConfigurationElementEditCreate(newElementId, { pic: imageFile })
+            .then(() => {
+              alert('Новый элемент успешно создан!');
+              navigate(ROUTES.ELEMENTS);
+            })
+            .catch((error) => {
+              setError('Ошибка при добавлении изображения');
+              console.error(error);
+            });
+        } else {
+          alert('Новый элемент успешно создан!');
+          navigate(ROUTES.ELEMENTS);
+        }
       } catch (error) {
         setError('Ошибка при создании нового элемента');
         console.error(error);
