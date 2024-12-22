@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import filterReducer from './filterSlice'; // Импортируем редюсер фильтров
 import authReducer from './authSlice'; // Импортируем редюсер авторизации
 import configurationElementsReducer from './configurationElementsSlice';
+import configurationReducer from './configurationSlice'
 import loggerMiddleware from './loggerMiddleware';
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
     filter: filterReducer, 
     auth: authReducer, 
     configurationElements: configurationElementsReducer,
+    configuration: configurationReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(loggerMiddleware), // Добавление loggerMiddleware

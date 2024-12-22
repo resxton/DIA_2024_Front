@@ -11,90 +11,85 @@ import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
 import { clearDraft } from './redux/configurationElementsSlice';
 import defaultImage from './assets/Default.jpeg';
+import { deleteConfiguration, deleteElement, fetchConfiguration, updateElementCount } from './redux/configurationSlice';
 
 
 const ConfigurationPage: FC = () => {
-  const { id } = useParams(); 
-  const [configuration, setConfiguration] = useState<PlaneConfigurationResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [customerPhone, setCustomerPhone] = useState<string>('');
-  const [customerName, setCustomerName] = useState<string>('');
-  const [customerEmail, setCustomerEmail] = useState<string>('');
-  const [, setConfigurationStatus] = useState<string>('');
+  const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const [error, setError] = useState('');
-
+  const dispatch = useDispatch();
+  const { configuration, loading, error } = useSelector((state: RootState) => state.configuration);
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    if (!id) return;
-  
-    api.planeConfiguration
-      .planeConfigurationRead(Number(id))
-      .then((response) => {
-        const data = response.data as PlaneConfigurationResponse;
-        setConfiguration(data);
-      })
-      .catch((error) => {
-        if (error.response && (error.response.status === 403) || (error.response.status === 401)){
-          setError('403');
-        } else if (error.response && error.response.status === 404) {
-          setError('404');
-        } else {
-          setError('not_found');
-        }
-        console.error('Ошибка при загрузке конфигурации:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [id]);
-
-    // Редирект при изменении isAuthenticated
-    useEffect(() => {
-      if (!isAuthenticated) {
-        navigate(ROUTES.PAGE_403); // Предполагается, что "/" — это ROUTES.HOME
-      }
-    }, [isAuthenticated, navigate]);
-  
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
 
   useEffect(() => {
-    if (!id) return;
-  
-    api.planeConfiguration
-      .planeConfigurationRead(Number(id))
-      .then((response) => {
-        const data = response.data as PlaneConfigurationResponse;
-        console.log('Полученные данные:', data);
-  
-        // Преобразуем counts в массив, если это объект
-        if (data.counts && typeof data.counts === 'object') {
-          data.counts = Object.values(data.counts); // Преобразуем объект в массив
-        }
-  
-        setConfiguration(data);
-        setCustomerEmail(data.configuration.customer_email || "")
-        setCustomerName(data.configuration.customer_name || "")
-        setCustomerPhone(data.configuration.customer_phone || "")
-        setConfigurationStatus(data.configuration.status || "")
-      })
-      .catch((error) => {
-        console.error('Ошибка при загрузке конфигурации:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [id]);
+    if (id) {
+      dispatch(fetchConfiguration(Number(id)) as any);
+    }
+  }, [id, dispatch]);
 
-  if (error === '403') {
-    navigate('/403')
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.PAGE_403);
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleDeleteElement = (elementId: number) => {
+    if (configuration) {
+      dispatch(deleteElement({ configurationId: configuration.configuration.pk, elementId }) as any);
+    }
+  };
+
+  const handleUpdateQuantity = (elementId: number, action: 'increment' | 'decrement') => {
+    if (!configuration || !configuration.counts) return;
+  
+    // Получаем текущее количество из объекта counts по элементу
+    const currentCount = configuration.counts[elementId];
+  
+    // Если текущее количество существует, обновляем его
+    const newCount = currentCount !== undefined
+      ? (action === 'increment' ? currentCount + 1 : currentCount - 1)
+      : 1; // Если количество не задано, инициализируем его как 1
+  
+    // Отправляем обновленное количество в запрос
+    dispatch(updateElementCount({ configurationId: configuration.configuration.pk, elementId, count: newCount }) as any);
+  };
+  
+
+// Обработчик для подтверждения конфигурации
+const handleConfirm = () => {
+  
+};
+
+// Обработчик для изменения конфигурации
+const handleEdit = () => {
+  
+};
+
+const handleDeleteConfiguration = () => {
+  if (!id) return;
+
+  dispatch(deleteConfiguration(id) as any)
+    .then(() => {
+      alert('Конфигурация успешно удалена');
+      navigate(ROUTES.ELEMENTS);
+    })
+    .catch((error: any) => {
+      console.error('Ошибка при удалении конфигурации:', error);
+      alert('Не удалось удалить конфигурацию');
+    });
+};
+
+  if (loading) {
+    return <Spinner animation="border" role="status" variant="light" />;
   }
 
-  if (error === '404') {
-    navigate('/404')
+  if (error) {
+    return <div>{error}</div>;
   }
-
 
   // Функция для преобразования даты
   const formatDate = (dateString: string) => {
@@ -113,140 +108,6 @@ const ConfigurationPage: FC = () => {
 
     return formattedDate;
   };
-
-  // Определение типов для статусов
-  type ServerStatus = 'draft' | 'deleted' | 'created' | 'completed' | 'rejected';
-  type HumanReadableStatus = 'Черновик' | 'Удалена' | 'Сформирована' | 'Завершена' | 'Отклонена';
-
-  // Объект сопоставления статусов
-  const statusMap: Record<ServerStatus, HumanReadableStatus> = {
-    draft: 'Черновик',
-    deleted: 'Удалена',
-    created: 'Сформирована',
-    completed: 'Завершена',
-    rejected: 'Отклонена',
-  };
-
-  // Функция для преобразования статуса
-  const getHumanReadableStatus = (serverStatus: ServerStatus): HumanReadableStatus | 'Неизвестный статус' => {
-    return statusMap[serverStatus] || 'Неизвестный статус';
-  };
-
-
-  const handleUpdateQuantity = (elementId: number, action: 'increment' | 'decrement') => {
-    if (!configuration || !Array.isArray(configuration.counts)) return;
-  
-    const elementIndex = configuration.configuration_elements.findIndex(
-      (element) => element.pk === elementId
-    );
-  
-    if (elementIndex !== -1) {
-      const updatedCounts = [...configuration.counts];
-      const newCount = action === 'increment' 
-        ? updatedCounts[elementIndex] + 1 
-        : updatedCounts[elementIndex] - 1;
-  
-      if (newCount <= 0) {
-        handleDeleteElement(elementId);
-      } else {
-        api.configurationMap.configurationMapUpdate(
-          { count: newCount },
-          configuration.configuration.pk,
-          elementId
-        )
-          .then(() => {
-            updatedCounts[elementIndex] = newCount;
-            setConfiguration({
-              ...configuration,
-              counts: updatedCounts,
-            });
-          })
-          .catch((error) => console.error('Ошибка при обновлении количества:', error));
-      }
-    }
-  };
-  
-  
-
-  const handleDeleteElement = (elementId: number) => {
-    if (!configuration) return;  // Проверка на наличие конфигурации
-  
-    api.configurationMap.configurationMapDelete(configuration.configuration.pk, elementId)
-      .then(() => {
-        // Удаление элемента из локального состояния
-        const updatedConfiguration = {
-          ...configuration,
-          configuration_elements: configuration.configuration_elements.filter(
-            (element) => element.pk !== elementId
-          ),
-          counts: configuration.counts.filter((_, index) => index !== elementId), // Удаляем соответствующий элемент из counts
-        };
-  
-        setConfiguration(updatedConfiguration); // Обновляем состояние
-      })
-      .catch((error) => {
-        console.error('Ошибка при удалении элемента:', error);
-      });
-  };  
-
-
-  const handleDeleteConfiguration = (configurationId: number) => {
-    api.planeConfiguration.planeConfigurationDelete(configurationId)
-      .then(() => {
-        clearDraft()
-        // Редирект на страницу с элементами
-        navigate(ROUTES.ELEMENTS);  // Переход к роуту /elements (или другой путь, если нужно)
-      })
-      .catch((error) => {
-        // Обрабатываем ошибку удаления
-        console.error('Ошибка при удалении конфигурации:', error);
-        alert('Не удалось удалить конфигурацию.');
-      });
-  };
-
-  const handleSubmit = () => {
-    if (!id || !configuration) return;
-
-    api.planeConfiguration
-      .planeConfigurationSubmitUpdate(id)
-      .then(() => {
-        alert('Заявка успешно оформлена');
-        setLoading(false);
-        navigate(ROUTES.ELEMENTS);  // Переход к роуту /elements (или другой путь, если нужно)
-      })
-      .catch((error) => {
-        console.error('Ошибка при обновлении конфигурации:', error);
-        alert('Не удалось обновить конфигурацию');
-      });
-  };
-
-
-  const handleEditConfiguration = () => {
-    if (!id || !configuration) return;
-
-    const updatedConfiguration: Configuration = {
-      ...configuration.configuration,
-      customer_name: customerName,
-      customer_phone: customerPhone,  // Обновленный номер телефона
-      customer_email: customerEmail,  // Обновленный email
-    };
-
-    api.planeConfiguration
-      .planeConfigurationUpdate(id, updatedConfiguration)  // Используем новый метод обновления
-      .then(() => {
-        alert('Заявка успешно изменена');
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Ошибка при изменении конфигурации:', error);
-        alert('Не удалось изменить конфигурацию');
-      });
-};
-
-
-  if (loading) {
-    return <Spinner animation="border" role="status" variant="light" />;
-  }
 
   return (
     <div className="configuration-page">
@@ -437,7 +298,7 @@ const ConfigurationPage: FC = () => {
 
                               {/* Отображение количества */}
                               <span className="badge text-black px-3 py-2 fs-5" style={{ minWidth: '50px', textAlign: 'center' }}>
-                                {configuration.counts[index] || 0}
+                                {configuration.counts[element.pk] || 0}
                               </span>
 
                               {/* Кнопка увеличения количества */}
@@ -454,7 +315,7 @@ const ConfigurationPage: FC = () => {
                           ) : (
                             // Когда статус не "draft", только отображение количества
                             <span className="badge text-black px-3 py-2 fs-5" style={{ minWidth: '50px', textAlign: 'center' }}>
-                              {configuration.counts[index] || 0}
+                              {configuration.counts[element.pk] || 0}
                             </span>
                           )}
                           <Button 
@@ -475,11 +336,11 @@ const ConfigurationPage: FC = () => {
               )}
             </Col>
 
-            {configuration.configuration.status === 'draft' && (
+            {configuration && configuration.configuration.status === 'draft' && (
               <div>
-                <Button variant="primary" onClick={handleSubmit} className="m-2">Подтвердить конфигурацию</Button>
-                <Button variant="warning" onClick={() => handleEditConfiguration()} className="m-2">Изменить конфигурацию</Button>
-                <Button variant="danger" onClick={() => handleDeleteConfiguration(configuration.configuration.pk)} className="m-2">Удалить конфигурацию</Button>
+                <Button variant="primary" onClick={handleConfirm} className="m-2">Подтвердить конфигурацию</Button>
+                <Button variant="warning" onClick={handleEdit} className="m-2">Изменить конфигурацию</Button>
+                <Button variant="danger" onClick={handleDeleteConfiguration} className="m-2">Удалить конфигурацию</Button>
               </div>
             )}
 

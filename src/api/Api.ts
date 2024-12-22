@@ -530,7 +530,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request DELETE:/plane_configuration/{id}/
      * @secure
      */
-    planeConfigurationDelete: (id: number, params: RequestParams = {}) =>
+    planeConfigurationDelete: (id: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/plane_configuration/${id}/`,
         method: "DELETE",
