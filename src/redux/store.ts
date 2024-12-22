@@ -9,7 +9,7 @@ export const store = configureStore({
   reducer: {
     filter: filterReducer, 
     auth: authReducer, 
-    configurationElements: configurationElementsReducer
+    configurationElements: configurationElementsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(loggerMiddleware), // Добавление loggerMiddleware

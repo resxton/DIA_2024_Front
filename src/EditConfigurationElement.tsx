@@ -169,7 +169,7 @@ const EditConfigurationElementPage = () => {
   }
 
   return (
-    <Container className="mt-4">
+    <Container fluid className="mt-4">
       <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
       <BreadCrumbs
         crumbs={[
@@ -177,8 +177,8 @@ const EditConfigurationElementPage = () => {
           { label: ROUTE_LABELS.EDIT_ELEMENT, path: ROUTES.EDIT_ELEMENT },
         ]}
       />
-      <h2 className="mt-4">Редактировать элемент конфигурации</h2>
-      <Form className="mt-3">
+      <h2 className="mt-4 p-4">Редактировать элемент конфигурации</h2>
+      <Form className="mt-3 p-4">
         <Row>
           <Col md={6}>
             <Form.Group controlId="name">

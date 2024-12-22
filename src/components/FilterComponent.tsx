@@ -110,13 +110,10 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         </Col>
       </Form.Group>
 
-      <Button type="submit" className="filter-btn" style={ {
-        backgroundColor: "#000",
-        color: '#fff',
-        border: 'none',
-      } }>
+      <Button>
         Фильтровать
       </Button>
+
     </Form>
   );
 };

@@ -9,8 +9,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
-import CartElementCard from './components/CartElementCard';
 import { clearDraft } from './redux/configurationElementsSlice';
+import defaultImage from './assets/Default.jpeg';
+
 
 const ConfigurationPage: FC = () => {
   const { id } = useParams(); 
@@ -20,7 +21,7 @@ const ConfigurationPage: FC = () => {
   const [customerName, setCustomerName] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [, setConfigurationStatus] = useState<string>('');
-  const navigate = useNavigate();  // Инициализируем navigate
+  const navigate = useNavigate();
   const dispatch = useDispatch()
   const [error, setError] = useState('');
 
@@ -275,8 +276,8 @@ const ConfigurationPage: FC = () => {
                     <Row>
                       <Col md={6}>
                         <Form.Group className="mb-3">
-                          <Form.Label>Статус</Form.Label>
-                          <Form.Control type="text" value={getHumanReadableStatus(configuration.configuration.status)} disabled />
+                          <Form.Label>Самолет</Form.Label>
+                          <Form.Control type="text" value={configuration.configuration.plane ?? "Global 7500"} />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
@@ -334,8 +335,8 @@ const ConfigurationPage: FC = () => {
                     <Row>
                       <Col md={6}>
                         <Form.Group className="mb-3">
-                          <Form.Label>Статус</Form.Label>
-                          <Form.Control type="text" value={getHumanReadableStatus(configuration.configuration.status)} disabled />
+                          <Form.Label>Самолет</Form.Label>
+                          <Form.Control type="text" value={configuration.configuration.plane ?? "Global 7500"} disabled />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
@@ -398,84 +399,77 @@ const ConfigurationPage: FC = () => {
               {configuration.configuration_elements.length > 0 ? (
                 <div>
                   {configuration.configuration_elements.map((element: ConfigurationElement, index: number) => (
-                    <Row key={element.pk} className="mb-4 align-items-center">
-                    {/* Карточка элемента */}
-                    {configuration.configuration.status !== 'draft' ? (
-                      <Col xs={12} md={10} className="mb-3">
-                        <CartElementCard 
-                          id={element.pk}
-                          name={element.name}
-                          price={element.price}
-                          category={element.category}
-                          image={element.image}
-                        />
-                      </Col>
-                    ) : (
-                      <Col xs={12} md={9} className="mb-3">
-                        <CartElementCard 
-                          id={element.pk}
-                          name={element.name}
-                          price={element.price}
-                          category={element.category}
-                          image={element.image}
-                        />
-                      </Col>
-                    )}
+                    <Card key={element.pk} className="mb-3 shadow-sm">
+                      <Card.Body style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {/* Используем image из элемента */}
+                        <div style={{ flex: '0 0 100px', marginRight: '10px', textAlign: 'center' }}>
+                          <img
+                            src={element.image || defaultImage}
+                            alt={element.name}
+                            style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '5px' }}
+                          />
+                        </div>
+                        <div style={{ flex: '1', textAlign: 'center', marginRight: '10px' }}>
+                          <p style={{ margin: '0', fontWeight: 'bold' }}>{element.name}</p>
+                        </div>
+                        <div style={{ flex: '0 0 100px', textAlign: 'center', marginRight: '10px' }}>
+                          <p style={{ margin: '0' }}>${element.price}</p>
+                        </div>
+                        <div style={{ flex: '1', textAlign: 'center', marginRight: '10px' }}>
+                          <p style={{ margin: '0' }}>{element.category}</p>
+                        </div>
+                        <div style={{ flex: '1', textAlign: 'center', marginRight: '10px' }}>
+                          <p style={{ margin: '0' }}>{element.key_info}</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'center' }}>
+                          {configuration.configuration.status === 'draft' ? (
+                            <>
+                              {/* Кнопка уменьшения количества */}
+                              <Button 
+                                variant="outline-secondary" 
+                                onClick={() => handleUpdateQuantity(element.pk, 'decrement')}
+                                size="sm"
+                                className="quantity-btn"
+                                style={{ padding: '0.5rem 1rem', fontSize: '1.2rem' }}
+                              >
+                                -
+                              </Button>
 
+                              {/* Отображение количества */}
+                              <span className="badge text-black px-3 py-2 fs-5" style={{ minWidth: '50px', textAlign: 'center' }}>
+                                {configuration.counts[index] || 0}
+                              </span>
 
-                    {/* Блок управления количеством */}
-                      {configuration.configuration.status === 'draft' ?  (
-                        <Col xs={12} md={3} className="d-flex flex-column align-items-start justify-content-center ps-md-5">
-                          <div className="quantity-control d-flex align-items-center gap-3 p-3 border rounded shadow-sm bg-light w-100">
-                            {/* Кнопка уменьшения количества */}
-                            <Button 
-                              variant="outline-secondary" 
-                              onClick={() => handleUpdateQuantity(element.pk, 'decrement')}
-                              size="lg"
-                              className="quantity-btn"
-                            >
-                              -
-                            </Button>
-
-                            {/* Отображение количества */}
-                            <span className="badge text-black px-2 py-3 fs-5">
+                              {/* Кнопка увеличения количества */}
+                              <Button 
+                                variant="outline-secondary" 
+                                onClick={() => handleUpdateQuantity(element.pk, 'increment')}
+                                size="sm"
+                                className="quantity-btn"
+                                style={{ padding: '0.5rem 1rem', fontSize: '1.2rem' }}
+                              >
+                                +
+                              </Button>
+                            </>
+                          ) : (
+                            // Когда статус не "draft", только отображение количества
+                            <span className="badge text-black px-3 py-2 fs-5" style={{ minWidth: '50px', textAlign: 'center' }}>
                               {configuration.counts[index] || 0}
                             </span>
-
-                            {/* Кнопка увеличения количества */}
-                            <Button 
-                              variant="outline-secondary" 
-                              onClick={() => handleUpdateQuantity(element.pk, 'increment')}
-                              size="lg"
-                              className="quantity-btn"
-                            >
-                              +
-                            </Button>
-                          </div>
-
-                          {/* Кнопка удаления элемента */}
+                          )}
                           <Button 
                             variant="danger" 
                             onClick={() => handleDeleteElement(element.pk)}
-                            className="mt-3 w-100"
-                            size="lg"
+                            size="sm"
+                            style={{ padding: '0.5rem 1rem', fontSize: '1.2rem' }}
                           >
                             Удалить
                           </Button>
-                        </Col>
-                      ) : 
-                      <Col xs={12} md={2} className="d-flex flex-column align-items-center justify-content-center ps-md-5">
-                        <div className="d-flex align-items-center justify-content-center p-3 border rounded shadow-sm bg-light w-100">
-                          {/* Отображение количества */}
-                          <span className="badge text-black px-2 py-3 fs-5">
-                            {configuration.counts[index] || 0}
-                          </span>
                         </div>
-                      </Col>
-                      }
-                  </Row>                                    
+                      </Card.Body>
+                    </Card>
                   ))}
-                </div> 
+                </div>
               ) : (
                 <p>Нет элементов в конфигурации.</p>
               )}

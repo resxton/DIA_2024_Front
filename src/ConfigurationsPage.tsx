@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { Container, Button, Table, Spinner } from 'react-bootstrap';
+import { Container, Button, Card, Spinner } from 'react-bootstrap';
 import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
@@ -27,6 +27,12 @@ const ConfigurationsPage: FC = () => {
   const handleGoToConfiguration = (id: number) => {
     navigate(`${ROUTES.CONFIGURATION}/${id}`);
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(ROUTES.PAGE_403);
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleApprove = (id: number) => {
     const confirmApprove = window.confirm('Вы уверены, что хотите одобрить эту заявку?');
@@ -61,11 +67,10 @@ const ConfigurationsPage: FC = () => {
       .planeConfigurationList(filters)
       .then((response) => {
         const newConfigurations = response.data;
-  
-        // Проверяем, изменились ли данные
+
         if (JSON.stringify(newConfigurations) !== JSON.stringify(configurations)) {
           setConfigurations(newConfigurations);
-          setFilteredConfigurations(newConfigurations); // Обновляем только при изменении
+          setFilteredConfigurations(newConfigurations);
         }
       })
       .catch((error) => {
@@ -75,7 +80,7 @@ const ConfigurationsPage: FC = () => {
         setLoading(false);
       });
   };
-  
+
   const handleFilterChange = (status: string, startDate: string, endDate: string) => {
     setFilters({
       status,
@@ -84,14 +89,12 @@ const ConfigurationsPage: FC = () => {
     });
   };
 
-
   useEffect(() => {
-  const fetchData = () => fetchConfigurations(filters);
-  fetchData();
-  const intervalId = setInterval(fetchData, 2000);
-  return () => clearInterval(intervalId);
-}, [filters]);
-
+    const fetchData = () => fetchConfigurations(filters);
+    fetchData();
+    const intervalId = setInterval(fetchData, 2000);
+    return () => clearInterval(intervalId);
+  }, [filters]);
 
   if (loading) {
     return <Spinner animation="border" role="status" variant="light" />;
@@ -99,16 +102,16 @@ const ConfigurationsPage: FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-  
+
     const formatter = new Intl.DateTimeFormat("ru-RU", {
       day: "numeric",
       month: "long",
       hour: "2-digit",
       minute: "2-digit",
     });
-  
+
     const formattedDate = formatter.format(date).replace(/^[а-я]/, (c) => c.toUpperCase());
-  
+
     return formattedDate;
   };
 
@@ -137,74 +140,74 @@ const ConfigurationsPage: FC = () => {
       <Container fluid className="mt-4 w-75">
         <h2 className="mb-4">Конфигурации</h2>
 
-        <ConfigurationFilterElement 
-          selectedStatus={filters.status} 
-          selectedStartDate={filters.created_after} 
-          selectedEndDate={filters.created_before} 
-          onFilterChange={handleFilterChange} 
+        <ConfigurationFilterElement
+          selectedStatus={filters.status}
+          selectedStartDate={filters.created_after}
+          selectedEndDate={filters.created_before}
+          onFilterChange={handleFilterChange}
         />
 
         {filteredConfigurations && filteredConfigurations.configurations.length > 0 ? (
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Статус</th>
-                <th style={{ width: '300px' }}>Дата создания</th>
-                <th>Цена</th>
-                <th>Заказчик</th>
-                <th style={{ width: '300px' }}>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredConfigurations.configurations
-                .sort((a, b) => a.pk - b.pk) 
-                .map((configuration) => (
-                  <tr key={configuration.pk}>
-                    <td>{configuration.pk}</td>
-                    <td>{getHumanReadableStatus(configuration.status)}</td>
-                    <td>{formatDate(configuration.created_at || "")}</td>
-                    <td>$ {configuration.total_price}</td>
-                    <td>{configuration.creator}</td> 
-                    <td className="d-flex">
-                      {user?.is_staff ? (
-                        <div className="d-flex justify-content-between" style={{ width: '300px', gap: '10px' }}>
-                          <Button
-                            variant="outline-primary"
-                            onClick={() => handleGoToConfiguration(configuration.pk)}
-                          >
-                            Подробнее
-                          </Button>
-                          <Button
-                            variant="success"
-                            onClick={() => handleApprove(configuration.pk)}
-                            title="Одобрить"
-                            style={{ width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                          >
-                            <BsCheck size={20} />
-                          </Button>
-                          <Button
-                            variant="danger"
-                            onClick={() => handleReject(configuration.pk)}
-                            title="Отклонить"
-                            style={{ width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                          >
-                            <BsX size={20} />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          variant="outline-primary"
-                          onClick={() => handleGoToConfiguration(configuration.pk)}
-                        >
-                          Подробнее
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </Table>
+          <div>
+            {/* Заголовки столбцов */}
+            <div style={{ display: 'grid', gridTemplateColumns:'repeat(5, 1fr) 350px', fontWeight: 'bold', marginBottom: '10px', textAlign: 'center', padding: '16px', gap: '15px'}}>
+              <div>ID</div>
+              <div>Статус</div>
+              <div>Дата создания</div>
+              <div>Цена</div>
+              <div>Заказчик</div>
+              <div>Действия</div>
+            </div>
+
+{filteredConfigurations.configurations
+  .sort((a, b) => a.pk - b.pk)
+  .map((configuration) => (
+    <Card key={configuration.pk} className="mb-3 shadow-sm">
+      <Card.Body>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 350px', gap: '15px', textAlign: 'center' }}>
+          <div>{configuration.pk}</div>
+          <div>{getHumanReadableStatus(configuration.status)}</div>
+          <div>{formatDate(configuration.created_at || "")}</div>
+          <div>${configuration.total_price}</div>
+          <div>{configuration.creator}</div>
+          <div className="d-flex gap-2 justify-content-center" style={{ gridColumn: 'span 1' }}>
+            {user?.is_staff ? (
+              <>
+                <Button
+                  variant="outline-primary"
+                  onClick={() => handleGoToConfiguration(configuration.pk)}
+                >
+                  Подробнее
+                </Button>
+                <Button
+                  variant="success"
+                  onClick={() => handleApprove(configuration.pk)}
+                >
+                  Одобрить
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleReject(configuration.pk)}
+                >
+                  Отклонить
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline-primary"
+                onClick={() => handleGoToConfiguration(configuration.pk)}
+              >
+                Подробнее
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  ))}
+
+
+          </div>
         ) : (
           <p>Нет конфигураций для отображения.</p>
         )}

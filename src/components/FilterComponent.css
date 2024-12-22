@@ -28,28 +28,6 @@
   font-size: 1rem;
 }
 
-/* Кнопка фильтрации */
-.filter-btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.filter-btn:hover {
-  background-color: #0056b3;
-}
-
-.filter-btn:active {
-  background-color: #003f8f;
-}
-
 /* Для мобильных устройств */
 @media (max-width: 768px) {
   .filter-container {
