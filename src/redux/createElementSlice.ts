@@ -14,6 +14,7 @@ const initialState: ConfigurationElementState = {
   error: null,
 };
 
+// Create new configuration element
 export const createConfigurationElement = createAsyncThunk(
   'configurationElement/create',
   async (
@@ -39,6 +40,28 @@ export const createConfigurationElement = createAsyncThunk(
   }
 );
 
+// Update existing configuration element
+export const updateConfigurationElement = createAsyncThunk(
+  'configurationElement/update',
+  async (
+    { id, formData, imageFile }: { id: string; formData: ConfigurationElement; imageFile: File | null },
+    { rejectWithValue }
+  ) => {
+    try {
+      await api.planeConfigurationElement.planeConfigurationElementEditUpdate(id, formData);
+
+      if (imageFile) {
+        await api.planeConfigurationElement
+          .planeConfigurationElementEditCreate(id, { pic: imageFile });
+      }
+
+      return formData;
+    } catch (error) {
+      return rejectWithValue('Ошибка при обновлении элемента');
+    }
+  }
+);
+
 const createElementSlice = createSlice({
   name: 'configurationElement',
   initialState,
@@ -58,6 +81,18 @@ const createElementSlice = createSlice({
         state.element = action.payload;
       })
       .addCase(createConfigurationElement.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateConfigurationElement.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateConfigurationElement.fulfilled, (state, action) => {
+        state.loading = false;
+        state.element = action.payload;
+      })
+      .addCase(updateConfigurationElement.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

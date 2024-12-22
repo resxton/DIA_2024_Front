@@ -6,19 +6,21 @@ import { api } from './api';
 import { ROUTES, ROUTE_LABELS } from './Routes';
 import CustomNavbar from './components/CustomNavbar';
 import { RootState } from './redux/store';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { BreadCrumbs } from './components/BreadCrumbs';
+import { createConfigurationElement, updateConfigurationElement } from './redux/createElementSlice';
 
 const EditConfigurationElementPage = () => {
   const { id } = useParams();
   const [element, setElement] = useState<ConfigurationElement | null>(null);
   const [formData, setFormData] = useState<ConfigurationElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.createElement);
 
   const categories = [
     'Компоновка салона',
@@ -30,7 +32,7 @@ const EditConfigurationElementPage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate(ROUTES.PAGE_403); 
+      navigate(ROUTES.PAGE_403);
     }
   }, [isAuthenticated, navigate]);
 
@@ -49,9 +51,6 @@ const EditConfigurationElementPage = () => {
       })
       .catch(() => {
         setError('Ошибка при загрузке данных.');
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }, [id]);
 
@@ -82,87 +81,21 @@ const EditConfigurationElementPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (formData && element) {
-      setLoading(true);
-
-      try {
-        await api.planeConfigurationElement
-          .planeConfigurationElementEditUpdate(id || '', {
-            ...formData,
-          })
-          .then(() => {
-            navigate(ROUTES.ELEMENTS);
-          })
-          .catch((error) => {
-            setError("Ошибка при сохранении изменений");
-            console.error(error);
-          });
-      } catch (error) {
-        setError("Ошибка при сохранении изменений");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  const handleSubmit = () => {
+    if (formData && id) {
+      dispatch(updateConfigurationElement({ id, formData, imageFile }) as any)
+        .unwrap()
+        .then(() => navigate(ROUTES.ELEMENTS_TABLE))
+        .catch((error: React.SetStateAction<string | null>) => setError(error));
     }
   };
 
-  const handleImageUpdate = async () => {
-    if (imageFile && id) {
-      setLoading(true);
-
-      try {
-        await api.planeConfigurationElement
-          .planeConfigurationElementEditCreate(id, { pic: imageFile })
-          .then(() => {
-            navigate(ROUTES.ELEMENTS);
-          })
-          .catch((error) => {
-            setError("Ошибка при обновлении изображения");
-            console.error(error);
-          });
-      } catch (error) {
-        setError("Ошибка при обновлении изображения");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleCreateNew = async () => {
+  const handleCreateNew = () => {
     if (formData) {
-      setLoading(true);
-
-      try {
-        const newElementResponse = await api.planeConfigurationElements
-          .planeConfigurationElementsCreate({
-            ...formData,
-          });
-
-        // После того как элемент создан, проверим, есть ли файл изображения
-        if (imageFile) {
-          const newElementId = newElementResponse.data.pk as unknown as string;
-          await api.planeConfigurationElement
-            .planeConfigurationElementEditCreate(newElementId, { pic: imageFile })
-            .then(() => {
-              alert('Новый элемент успешно создан!');
-              navigate(ROUTES.ELEMENTS);
-            })
-            .catch((error) => {
-              setError('Ошибка при добавлении изображения');
-              console.error(error);
-            });
-        } else {
-          alert('Новый элемент успешно создан!');
-          navigate(ROUTES.ELEMENTS);
-        }
-      } catch (error) {
-        setError('Ошибка при создании нового элемента');
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      dispatch(createConfigurationElement({ formData, imageFile }) as any)
+        .unwrap()
+        .then(() => navigate(ROUTES.ELEMENTS_TABLE))
+        .catch((error: React.SetStateAction<string | null>) => setError(error));
     }
   };
 
@@ -180,7 +113,7 @@ const EditConfigurationElementPage = () => {
 
   return (
     <Container fluid className="mt-4">
-      <CustomNavbar isAuthenticated={isAuthenticated} user={user} />
+      <CustomNavbar isAuthenticated={isAuthenticated} user={user}/>
       <BreadCrumbs
         crumbs={[
           { label: ROUTE_LABELS.ELEMENTS_TABLE, path: ROUTES.ELEMENTS_TABLE },
@@ -259,21 +192,7 @@ const EditConfigurationElementPage = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {imagePreview ? (
-            <Image
-              src={imagePreview}
-              alt="Preview"
-              fluid
-              style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
-            />
-          ) : (
-            <Image
-              src={element?.image || ''}
-              alt="Preview"
-              fluid
-              style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
-            />
-          )}
+          {imagePreview && <Image src={imagePreview} alt="Preview" fluid />}
         </Form.Group>
 
         <Form.Group controlId="detail_text" className="mt-3">
@@ -299,12 +218,6 @@ const EditConfigurationElementPage = () => {
             Отмена
           </Button>
         </div>
-
-        {imageFile && (
-          <Button variant="success" className="mt-3" onClick={handleImageUpdate}>
-            Обновить изображение
-          </Button>
-        )}
       </Form>
     </Container>
   );
