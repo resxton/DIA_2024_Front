@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../api';
+import axios from 'axios';
 
 // Интерфейс состояния аутентификации
 interface AuthState {
@@ -13,6 +14,7 @@ interface AuthState {
   loading: 'idle' | 'pending' | 'succeeded' | 'failed';
   error: string | null;
 }
+
 
 // const loadAuthFromLocalStorage = () => {
 //   const savedAuth = localStorage.getItem('auth');
@@ -35,15 +37,14 @@ export const loginAsync = createAsyncThunk(
     try {
       console.log(`Logging in with username: ${username}, password: ${password}`);
 
-      // Получаем ID пользователя по имени
-      const userResponse = await api.user.userGetIdByUsername(username);
-      const id = userResponse.data.id;
-
       // Логин пользователя с флагом withCredentials
       const response = await api.login.loginCreate({ username, password }, { withCredentials: true });
 
       if (response?.data.is_staff !== undefined) {
         const isStaff = response.data.is_staff;
+        // Получаем ID пользователя по имени
+        const userResponse = await api.user.userGetIdByUsername(username);
+        const id = userResponse.data.id;
         
         console.log(`Login successful for username: ${username}`);
         

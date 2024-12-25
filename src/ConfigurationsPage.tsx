@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import { useNavigate } from 'react-router-dom';
 import CustomNavbar from './components/CustomNavbar';
-import { BsCheck, BsX } from 'react-icons/bs';
 import { ConfigurationFilterElement } from './components/ConfigurationFilterElement';
 
 const ConfigurationsPage: FC = () => {

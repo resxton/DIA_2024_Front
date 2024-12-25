@@ -29,7 +29,7 @@ export const fetchConfigurationElements = createAsyncThunk(
       category,
       price_min,
       price_max,
-    });
+    }, { withCredentials: true });
     return response.data as ConfigurationElementsResult;
   }
 );

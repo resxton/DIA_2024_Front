@@ -1,15 +1,13 @@
 import { FC, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Button, Row, Col, Spinner, Card, Form } from 'react-bootstrap';
-import { api } from './api';
 import { BreadCrumbs } from './components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from './Routes';
-import { PlaneConfigurationResponse, ConfigurationElement, Configuration } from './api/Api';
+import { ConfigurationElement } from './api/Api';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import CustomNavbar from './components/CustomNavbar';
 import './ConfigurationPage.css';
-import { clearDraft } from './redux/configurationElementsSlice';
 import defaultImage from './assets/Default.jpeg';
 import { confirmConfiguration, deleteConfiguration, deleteElement, fetchConfiguration, updateConfiguration, updateElementCount } from './redux/configurationSlice';
 
